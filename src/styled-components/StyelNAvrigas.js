@@ -3,55 +3,81 @@ export const NavbarContainer = styled.nav`
   display: flex;
   flex-direction: column;
   background-color: #ffff;
-padding  :10px ;
-height: 88px;
+ justify-content: center;
+  height:100px;
+  gap: 20px;
 `;
-export const Line = styled.div`
-  height: 2px;
-  width: 98%;
-  align-self: center;
-  background-color: #4668F0;
-`;
-export const Navbarlogo = styled.nav`
-  display: flex;
-  height: 60px;
-  align-items: center;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #ffff;
-  padding: 10px;
-  
-`;
-export const ASP=styled.div`
-display: flex;
-flex-direction: row;
-justify-content: last baseline;
-height: 60px;
-`;
+
 export const CardNav=styled.div`
 display: flex;
 flex-direction: row;
 justify-content: space-between;
+align-items: center;
+padding:0 15px ;
 
+`;
+
+export const Line = styled.hr`
+  height: 3px;
+  margin-top: -7px;
+  width: 100%;
+  background-color: #4175BC;
+`;
+export const Navbarlogo = styled.nav`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 60px;
+  background-color: #ffff;
+  
+  
 `;
 
 export const Logo = styled.img`
-  height: 35px;
-  width: 200px;
-  margin-right: 10px;
+  height: 50px;
+  width: 100%;
+  max-width: 300px;
+  object-fit: cover;
+  
 `;
 export const Caption = styled.p`
-  font-size: 20px;
-  color: #1A328E;
-  margin-top: 5px;
-  left: 0;
-  width: 243px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #192A6C;
+  margin-top: 0px;
+  height: 40px;
 `;
+
+export const ASP=styled.div`
+display: flex;
+flex-direction: row;
+align-items: center;
+height: 50px;
+
+`;
+export const TextAsp=styled.span`
+color: #00405F;
+font-weight: 650;
+font-size: 18px;
+margin-top: 35px;
+margin-left: -20px;
+`
+export const ASPtext=styled.span`
+color: #00405F;
+font-weight: 700;
+font-size: 75px;
+margin-top: -10px;
+
+
+`
 export const NavUser=styled.div`
 display:flex ;
-justify-content: baseline;
 flex-direction: column;
-height: 60px;
+justify-content: flex-end;
+align-items: flex-end;
+margin-top: 0px;
+
+
 `
 export const ContainerButton=styled.div`
 display:flex;
@@ -60,50 +86,56 @@ justify-content:flex-end;
 `
 
 export const  Button=styled.button`
-margin-right: 30px ;
-border-radius: 8px;
-height: auto ;
 margin-bottom: 10px;
-width: auto;
+
 color: #FFFFFF;
-  font-family: sans-serif;
-  font-style: italic;
-background-color: #192A6C;
-text-decoration: 14px;
+
+background-color: #00405F;;
+
+display: inline-block;
+ outline: 0;
+ border: none;
+ cursor: pointer;
+ padding: 0 24px;
+ border-radius: 50px;
+ min-width: 140px;
+ height: 30px;
+ font-size: 14px;
+border:3px solid #4C7DBF ;
+
+ font-weight: 500;
+
 `
 export const ContainerUser=styled.div`
 display:flex;
 flex-direction: row;
-gap: 6px;
-`;
-export const Label=styled.label`
+align-items: center;
+gap: 50px;
+`; 
+export const ContainerText = styled.span`
+display:flex;
+flex-direction: row;
+align-items: center;
+gap: 20px;
+`
+export const TextUser = styled.span`
+  color: #ED1C24;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "gra", sans-serif;
+  
+`
+export const TextLog = styled.span`
+  color: #00405F;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "gra", sans-serif;
+  
+`
+export const TextRol = styled.span`
+  color: #00405F;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: -3px;
+`
 
-`
-export const TextLabel = styled.span`
-  color: #192A6C;
-  font-size: large;
-  font-family: "gra", sans-serif;
-  width: 150px;
-
-  `
-  export const TextUser = styled.span`
-  color: #ED1B1B;
-  font-size: large;
-  font-family: "gra", sans-serif;
-  width: auto;
-  `
-  export const TextRol = styled.span`
-  color: #192A6C;
-  font-size: large;
-  font-family: "gra", sans-serif;
-  width: auto;
-  `
-export const TextAsp=styled.h3`
-color: #1D4995;
-margin-top: 15%;
-`
-export const ASPtext=styled.h1`
-color:#1D4995;
-margin-top: 0%;
-font-size: 50px;
-`

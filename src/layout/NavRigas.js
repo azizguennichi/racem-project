@@ -4,7 +4,6 @@ import {
   NavUser,
   NavbarContainer,
   Navbarlogo,
-  Label,
   Logo,
   Button,
   ASP,
@@ -15,9 +14,10 @@ import {
   ContainerUser,
   Caption,
   Line,
-  TextLabel,
   TextRol,
   TextUser,
+  TextLog,
+  ContainerText
 } from "../styled-components/StyelNAvrigas";
 import { useDispatch } from "react-redux";
 import { logoutSuccess } from "../redux/apiCalls";
@@ -37,14 +37,17 @@ function NavRigas({ child }) {
           </Navbarlogo>
           <ASP>
             <ASPtext>ASP</ASPtext>
-            <TextAsp>GO,PRESTE,RIVAL</TextAsp>
+            <TextAsp>GO , PRESTE, RIVAL</TextAsp>
           </ASP>
           <NavUser>
             <ContainerButton>
-              <Button onClick={logoutHandler}>Se déconnecter</Button>
+              <Button onClick={logoutHandler}>Log Out</Button>
             </ContainerButton>
             <ContainerUser>
-              <TextUser>XXXXXXXX</TextUser>
+              <ContainerText>
+            <TextLog>Logged in as</TextLog>
+              <TextUser>XXXXXXX</TextUser>
+              </ContainerText>
               <TextRol>(Admin)</TextRol>
             </ContainerUser>
           </NavUser>

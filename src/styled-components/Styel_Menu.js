@@ -2,54 +2,99 @@ import styled from 'styled-components';
 import { MdSettingsSuggest } from 'react-icons/md';
 import { RiPlayList2Fill } from 'react-icons/ri';
 import { FaHome } from 'react-icons/fa';
+import { CgPlayListCheck} from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
+import {FcDataConfiguration} from 'react-icons/fc'
+import {VscDebugStart} from 'react-icons/vsc'
+import {AiFillTool} from 'react-icons/ai'
+
 
 export const MenuContainer = styled.nav`
   display: flex;
   justify-content: space-between;
   background-color: #ffff;
-  padding-left: 40px;
-  padding-right: 40px;
-  height: 40px;
-  margin-top: 5px;
+  padding:0 30px;
+  
+`;
+export const MenuItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+ 
+  background-color:${(props) => (props.active ? '#E6EEFA' : 'inherit')};
+  font-weight:${(props) => (props.active ? 'bold' : '400')};
+  border-bottom:${(props) => (props.active ? '3px solid #E6EEFA' : 'none')};
+  border-top:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
+  border-right:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
+  border-left:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
+
+
 `;
 
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: #ffff;
-  align-items: center;
+  align-items: center; 
+ 
+  margin-bottom:-0.4px;
+  z-index:222;
+
+ 
+  
+
+  padding: 0.5px 55px;
+ 
+  box-shadow: 0px 1px 0px 0px white;
+
+
+ 
+ 
+  
 `;
 
-export const MenuItem = styled.div`
-  display: flex;
-  align-items: center;
-`;
 
-export const StyledMdSettingsSuggest = styled(MdSettingsSuggest)`
-  color: #2B7595;
-  width: 40px;
+export const StyledAiTwotoneTool= styled(AiFillTool)`
+  color: #4C7DBF;
+  width: 50px;
   height: 25px;
 `;
 
-export const StyledRiPlayList2Fill = styled(RiPlayList2Fill)`
-  color: #2B7595;
-  width: 40px;
+
+
+export const StyledCgPlayListCheck = styled(CgPlayListCheck)`
+  color: #4C7DBF;
+  width: 50px;
   height: 25px;
 `;
 
-export const StyledFaHome = styled(FaHome)`
-  color: #2B7595;
-  width: 40px;
+export const StyledVscDebugStart = styled(VscDebugStart)`
+  color: #4C7DBF;
+  width: 50px;
   height: 25px;
 `;
+
 
 export const StyledFiLogOut = styled(FiLogOut)`
-  color: #2B7595;
-  width: 40px;
+  color: #4C7DBF;
+  width: 50px;
+  height: 25px;
+`;
+export const StyledMdSettingsSuggest = styled(MdSettingsSuggest)`
+  color: #4C7DBF;
+  width: 50px;
+  height: 25px;
+`;
+export const StyledFaHome = styled(FaHome)`
+  color: #4C7DBF;
+  width: 50px;
   height: 25px;
 `;
 
 export const Textmenu = styled.p`
-  color: #30BBF6;
+  color: #15428B;
+  
+  font-size: 14px;
+  height: 10px;
+ 
 `;

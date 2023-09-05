@@ -2,98 +2,200 @@ import styled, { keyframes } from 'styled-components';
 import {BsXCircleFill,BsFillCheckCircleFill}from 'react-icons/bs'
 import {FiPlay} from 'react-icons/fi'
 export const MainContainer = styled.div`
-width:100%;
-padding: 10px;
 display: flex;
 color: #ffff;
 flex-direction: column;
 justify-content: space-around;
-flex: auto;
+
 
 `;
 export const Container1 = styled.div`
-border: 1px solid #3139A5;
+border: 2px solid #8DB2E3;
 background-color: #ffff;
 justify-content: space-between;
-border-color:#1643F4 ;
-margin-left:7%;
-margin-right:7%;
-padding: 8px;
-flex: auto;
-
-`;
-
-export const Card1Container1 = styled.div`
-background-color: #3139A5;
-display: flex;
-width: 80%;
-justify-content: space-between;
-flex-direction: column;
-flex: auto;
-
+padding: 1px 20px;
+margin-top: -1px;
 
 `;
 export const InnerContainer1=styled.div`
 display: flex;
 flex-direction: row;
-justify-content: space-between;
+justify-content:space-between ;
+gap:20px;
 align-items: center;
-padding: 7px;
-flex: auto;
+padding: 10px;
 
 `
-export const MenuCard1 = styled.nav`
-flex-direction: row;
+
+export const Card1Container1 = styled.div`
+background-color: #0079C2;
 display: flex;
-background-color: #3139A5;
-height: 20px;
-width: auto;
+flex-direction: column;
+width: 100%;
+`;
+
+export const MenuCard1 = styled.div`
+
+display: flex;
+flex-direction: row;
+height: 35px;
 align-items: center;
+justify-content: center;
 margin-bottom: 8px;
-padding: 6px;
-justify-content: space-between;
-flex: auto;
+padding: 0 20px;
 
 
 `;
-export const Card1 = styled.div`
-background-color: #3139A5; 
+
+
+export const CardItem = styled.div`
+flex-direction: row;
 display: flex;
-padding: 7px;
+align-items: center;
+width: 100%;
+gap:10px;
+
+
+
+`;
+export const StyledSelect = styled.select`
+  font-size: 14px;
+  border: 2px solid #ccc;
+  background-color:#ccc ;
+  border-radius: 4px;
+  width: 90px;
+  min-height: 1.5em;
+  outline: none;
+  font-family: 'Signika Negative', sans-serif;
+
+
+  /* Customize other styles as needed */
+`;
+export const Text =styled.p`
+font-size: 14px;
+font-family: 'Poppins', sans-serif; 
+color: #ffff;
+`
+export const Green =styled.span`
+font-size: 17px;
+font-family: 'Poppins', sans-serif; 
+color: #9CE61D;
+`
+
+export const LabelTotal =styled.input`
+font-size: 16px;
+padding: 2px;
+width: 100px;
+color: black;
+text-align: center;
+font-weight: bold;
+`
+export const LabelTotalOk =styled.input`
+font-size: 14px;
+padding:3px;
+width: 100px;
+color: green;
+text-align: center;
+font-weight: bold;
+`
+export const LabelTotalNot =styled.input`
+font-size: 14px;
+padding:3px;
+width: 100px;
+color: red;
+text-align: center;
+font-weight: bold;
+`
+
+export const Label=styled.input`
+padding:3px;
+width: 100px;
+color: red;
+text-align: center;
+font-weight: bold;
+
+`
+export const LabelMac=styled.input`
+background-color: #ffff;
+width: 80%;
+padding:2px;
+text-align: center;
+font-family: 'Signika Negative', sans-serif;
+background-color: #0079C2;
+color: #ffff;
+border: 2.5px solid #ffff;
+
+`
+export const LabelModel=styled.input`
+
+width: 50%;
+padding:2px;
+text-align: center;
+font-family: 'Signika Negative', sans-serif;
+background-color: #0079C2;
+color: #ffff;
+border: 3px solid #ffff;
+  
+
+`
+export const LabelSerial=styled.input`
+background-color: #0079C2;
+color: #ffff;
+border: 3px solid #ffff;
+width: auto;
+padding:2px;
+text-align: center;
+font-family: 'Signika Negative', sans-serif;
+  
+`
+export const Card1 = styled.div`
+
+display: flex;
+padding: 5px 15px 5px 15px;
 flex-direction: row;
 justify-content: space-between;
-flex: auto;
+
+
+`;
+export const InnerDivCard1 = styled.div`
+
+display: flex;
+width: 100%;
+flex-direction: column;
+margin-top: -15px;
+
+
+
 
 `;
 export const InnerDiv1Card1 = styled.div`
-background-color: #3139A5;
+background-color: #0079C2;
 display: flex;
-flex-direction: column;
-flex: auto;
+flex-direction: row;
+justify-content: flex-start;
+gap: 20%;
+
 
 `;
 
 export const InnerDiv2Card1 = styled.div`
-background-color: #3139A5;
+background-color: #0079C2;
 display: flex;
-justify-content: space-between;
 flex-direction: column;
-align-items: center;
-flex: auto;
 
 
 `;
 export const InnerButton=styled.div`
-margin-top: 5%;
-background-color: #3139A5;
-justify-content: space-between;
+background-color: #0079C2;
 display: flex;
 flex-direction: row;
-flex: auto;
+justify-content:flex-end;
+align-items: center;
+padding:0 50px;
 
  /* Add margins between components */
  & > * {
-    margin-right: 10px; /* Adjust the margin value as per your preference */
+    margin-right: 20px; /* Adjust the margin value as per your preference */
   }
 
   /* Remove the margin from the last child to avoid extra space after the last component */
@@ -109,106 +211,68 @@ export const InnerDiv3Card1 = styled.div`
   grid-template-rows: repeat(3, 1fr);
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  margin-right: 7%;
-  flex: auto;
-
+  padding:5px 7px;
+  width :30% ;
+  margin-right: 25px;
+  margin-top: -8px;
 `;
 
 export const Step=styled.div`
-border-color: #ffff;
 width: 20%;
-max-height: 220px;
-display: flex;
-border: 2px solid #D0D3F9;
-flex-direction: column;
-align-items: center;
-flex: auto;
-overflow: auto; 
-
+height: 190px;
+border: 3px solid #D0D3F9;
 `
-export const Text =styled.p`
-font-size: 16px;
-font-family: 'Poppins', sans-serif; 
-color: #ffff;
-flex: auto;
-
-`
-export const StyledSelect = styled.select`
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: none;
-  font-family: 'Signika Negative', sans-serif;
-  flex: auto;
 
 
-  /* Customize other styles as needed */
-`;
-export const Label=styled.input`
-background-color: #ffff;
-color: black;
-width: auto;
-height: 20px;
-  text-align: center;
-  font-family: 'Signika Negative', sans-serif;
-  flex: auto;
-
-`
-export const LabelMac=styled.input`
-background-color: #ffff;
-width: 10%;
-color: black;
-height: 20px;
-  text-align: center;
-  font-family: 'Signika Negative', sans-serif;
-  flex: auto;
-
-`
-export const LabelModel=styled.input`
-background-color: #ffff;
-width: 5%;
-color: black;
-height: 20px;
-  text-align: center;
-  font-family: 'Signika Negative', sans-serif;
-  flex: auto;
-
-`
-export const LabelSerial=styled.input`
-background-color: #ffff;
-width: 7.5%;
-color: black;
-height: 20px;
-  text-align: center;
-  font-family: 'Signika Negative', sans-serif;
-`
 export const Button=styled.button`
-background-color:#0A122F ;
-color: #ffff;
-border-radius: 4px;
-max-height: 30px;
 font-family: 'Signika Negative', sans-serif;
-`
-export const ButtonRun=styled.button`
 background-color:#0A122F ;
-color: #ffff;
-display: flex;
-justify-content: space-between;
-border-radius: 8px;
-margin-bottom: 25%;
-font-size: 20px;
-width: 70px;
+border-radius: 10px;
 align-items: center;
 align-content: center;
 align-self: center;
-font-family: 'Signika Negative', sans-serif;
+color: #FFFFFF;
+ cursor: pointer;
+ padding: 0 35px;
+ min-width: 100px;
+ height: 27px;
+ font-size: 14px;
+ 
+ gap: 10px;
+`
+export const ButtonRun=styled.button`
+background-color:#0A122F ;
+
+display: flex;
+justify-content: space-between;
+border-radius: 15px;
+align-items: center;
+align-content: center;
+align-self: center;
+color: #FFFFFF;
+ cursor: pointer;
+ padding: 0 25px;
+ min-width: 100px;
+ height: 40px;
+ font-size: 14px;
+ 
+ gap: 10px;
 `
 export const TextScrole =styled.p`
-font-size: 12px;
+font-size: 14px;
 font-family: 'Signika Negative', sans-serif;
 color: #ffff;
-margin-right: 40%;
+width: 20%;
+margin-right:-20px;
+
+`
+export const TextScrole1 =styled.p`
+font-size: 14px;
+font-family: 'Signika Negative', sans-serif;
+color: #ffff;
+width: 20%;
+
+
 `
 export const TextStp =styled.p`
 font-size: 12px;
@@ -223,7 +287,7 @@ export const Card2Container1 = styled.div`
 `;
 
 export const MenuCard2 = styled.nav`
-background-color: #3139A5;
+background-color: #0079C2;
 display:flex;
 flex-direction: row;
 align-items: center;
@@ -239,7 +303,7 @@ export const Card2 = styled.div`
 export const Electric=styled.div`
 display:flex;
 flex-direction: column;
-background-color: #3139A5;
+background-color: #0079C2;
 padding: 10px;
 flex: auto;
 
@@ -293,11 +357,12 @@ export const progressAnimation1 = keyframes`
   }
 `;
 export const ProgressBarContainer1 = styled.div`
-  height: 20px;
-  width: 200%; /* Set the desired width for the progress bar container */
+  height: 30px;
+  width: 100%; /* Set the desired width for the progress bar container */
   background-color: #f2f2f2;
   border-radius: 4px;
-  flex: auto;
+  margin-right: 40px;
+ 
 
 `;
 
@@ -305,19 +370,19 @@ export const ProgressBar1 = styled.div`
   height: 100%;
   width: 100%; /* Make sure the progress bar always fills the container */
   max-width: 200%; /* Set the maximum width to 350px to round the width */
-  background-color: green;
+  background: linear-gradient(90deg, rgba(4,122,24,1) 0%, rgba(11,223,45,1) 3%, rgba(11,223,45,1) 97%, rgba(4,122,24,1) 100%);
+;
   border-radius: 4px;
   animation: ${progressAnimation} 2s ease-in-out;
-  flex: auto;
+ 
 
 `;
 
 export const ProgressBarContainer = styled.div`
-  width: 200px;
-  height: 20px;
+ 
   background-color: #f2f2f2;
   border-radius: 4px;
-  flex: auto;
+  
 
 `;
 
@@ -377,7 +442,19 @@ export const SubDiv = styled.div`
   flex: auto;
 
 `;
+export const DivVerifier = styled.fieldset`
+border: 2px solid #8DB2E3;
+margin: 3px 0px;
+`;
 
+export const TextInsideBorder = styled.legend`
+  font-size: 28px;
+ font-weight: bold;
+  color: #14185A;
+  font-family: 'Signika Negative', sans-serif;
+
+`;
+/*
 export const DivVerifier = styled.div`
   position: relative;
   flex-direction: column;
@@ -390,8 +467,8 @@ justify-content: center;
 align-items: center;
 margin-top: 1.5%;
 flex: auto;
-
 `;
+
 export const TextInsideBorder = styled.span`
   position: absolute;
   top: -20px;
@@ -402,33 +479,37 @@ export const TextInsideBorder = styled.span`
   font-family: 'Signika Negative', sans-serif;
 
 `;
-
+*/
 export const CardButton = styled.div`
   display: flex;
   flex-direction: row;
-  padding: 7px;
+  padding: 0 7px;
   justify-content:space-around ;
-  flex: auto;
+  margin-top: -23px;
+
+  
 
 `;
 
 export const TextVerif = styled.p`
-  font-size: 30px;
+  font-size: 33px;
   font-family: 'Signika Negative', sans-serif;
   color: blue;
-  justify-self: center;
-  justify-content: center;
-  align-items: center;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 5px;
 `;
 
 export const IconCheck = styled(BsFillCheckCircleFill)`
  color: green;
-  font-size: 50px;
+  font-size: 60px;
+  cursor: pointer;
 `;
 
 export const IconX = styled(BsXCircleFill)`
   color: red;
-  font-size: 50px;
+  font-size: 60px;
+  cursor: pointer;
 `;
 
 export const TextGreen=styled.h4`
@@ -465,26 +546,30 @@ export const ModalContainer = styled.div`
 
 `;
 export const Run=styled(FiPlay)`
-align-self: center;
-align-items: center ;
+margin-bottom:2px;
 color: white; /* Set the color of the icon to white */
+font-size: 20px;
+
 
 `;
-export const divTextProg=styled.div`
-display: flex;
-direction: column;
-justify-content: space-evenly;
-width: auto;
-flex: auto;
+export const DivTextProg=styled.div`
+display:flex ;
+justify-content : flex-start;
+align-items: center;
+padding:5px 10px 5px 0;
+
+
 
 `;
 export const LabelEta = styled.input`
-  width: 150px;
-  border: 1px solid green; /* Corrected border syntax */
-  color: green;
-  text-align: center  ;
+  padding: 7px 4px;
+  border: 4px solid #32CD32; /* Corrected border syntax */
+  color: #32CD32;
+  font-size: 15px;
+  text-align: center ;
   background-color: #ffff;
-  align-items: center;
+  margin-left: 30px;
+  margin-top: 25px;
 `;
 export const DivPopup =styled.div`
 background-color: #ffff;
@@ -509,11 +594,14 @@ export const TableWrapper = styled.div`
 export const Table = styled.table`
   border-collapse: collapse;
   width: 100%;
+  
+  
  
 `;
 
 export const Tr = styled.tr`
-background-color: ${(props) => (props.active ? '#244FDB' : 'inherit')};
+background-color: ${(props) => (props.active ? '#3399FF' : 'inherit')};
+color:${(props) => (props.active ? 'white' : 'black')};
 `;
 
 export const Td = styled.td`
@@ -521,6 +609,127 @@ export const Td = styled.td`
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
-  color:black;
+ 
   width: 50%;
 `;
+
+export const TextField= styled.text`
+`;
+
+
+
+/* element of card 2  */  
+
+export const InnerContainer2=styled.div`
+display: flex;
+flex-direction: row;
+justify-content:space-between ;
+gap:20px;
+align-items: center;
+padding:10px;
+margin-top: -12px;
+`
+
+export const Card1Container2 = styled.div`
+background-color: #0079C2;
+display: flex;
+flex-direction: column;
+width: 100%;
+`;
+export const Menu1Card2 = styled.div`
+
+display: flex;
+flex-direction: row;
+height: 38px;
+justify-content: space-between;
+
+padding:12px 10px;
+`;
+export const CardItem2 = styled.div`
+flex-direction: row;
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 60%;
+gap:5px;
+padding: 10px;
+`
+export const CardItem3 = styled.div`
+flex-direction: row;
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 200%;
+gap:10px;
+padding: 10px;
+`
+export const CardItem4 = styled.div`
+flex-direction: row;
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 120%;
+gap:5px;
+padding: 10px;
+`
+export const CardItem5 = styled.div`
+flex-direction: row;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap:5px;
+padding: 10px;
+`
+export const LabelEta2 = styled.input`
+  padding: 7px 4px;
+  border: 4px solid #32CD32; /* Corrected border syntax */
+  color: #32CD32;
+  font-size: 15px;
+  text-align: center ;
+  background-color: #ffff;
+  
+`;
+export const InnerDivCard2 = styled.div`
+
+display: flex;
+width: 100%;
+flex-direction: row;
+margin:7px 0;
+gap: 5px;
+
+
+
+
+`;
+export const Outer = styled.fieldset`
+ border: 1px solid #6593CF;
+  margin: 0 auto;
+  padding: 1em;
+  width:32%;
+  height: 100px;
+  background-color: #CDE3FF;
+  text-align: center;
+  border-radius: 15px;
+  display: flex; /* Add flex display to center children vertically */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center children vertically */
+ 
+`;
+
+
+// Styled component for the inner 
+export const Inner = styled.legend`
+  font-weight: bold;
+  border: 1px solid #6593CF;
+  margin-bottom: 0.5em;
+  text-align: center;
+  padding: 2px 20px;
+  background-color: #CDE3FF;
+  color: #37378E;
+`;
+
+export const H3 = styled.h3`
+ text-align: center;
+ margin-top: -6px; /* Remove default margin to avoid extra spacing */
+color: #37378E;
+`

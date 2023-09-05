@@ -3,10 +3,14 @@ import Testes from "../datat.json";
 import {
   MainContainer,
   InnerContainer1,
+  InnerContainer2,
   Container1,
   Card1Container1,
+  Card1Container2,
   MenuCard1,
+  Menu1Card2,
   Card1,
+  InnerDivCard1,
   InnerDiv1Card1,
   InnerDiv2Card1,
   InnerButton,
@@ -49,12 +53,29 @@ import {
   LabelActivity,
   ModalContainer,
   Run,
-  divTextProg,
+  CardItem,
+  CardItem2,
+  CardItem3,
+  CardItem4,
+  CardItem5,
+  TextField,
+  DivTextProg,
   LabelEta,
+  LabelEta2,
   DivPopup,
   Table,
+  Field,
   Tr,
   Td,
+  Inner,
+  Outer,
+  InnerDivCard2,
+  H3,
+  LabelTotal,
+  LabelTotalOk,
+  LabelTotalNot,
+  Green,
+  TextScrole1,
 } from "../styled-components/StylerunTest";
 import { publicRequest } from "../requestMethod";
 
@@ -75,9 +96,9 @@ function Runtest() {
   const [StatGetData, setGetData] = useState([]);
   const [activeTestIndex, setActiveTestIndex] = useState(0);
 
-  const handleFetchData =async () => {
+  const handleFetchData = async () => {
     try {
-      const response =await publicRequest.get("/getAllTests");
+      const response = await publicRequest.get("/getAllTests");
       console.log(response);
       const testnames = response.data.map((test) => test.name);
       setTestNames(testnames);
@@ -85,9 +106,9 @@ function Runtest() {
       console.log(error);
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
     handleFetchData();
-  },[]);
+  }, []);
   useEffect(() => {
     // Assuming 'Tests' is an array containing test objects with a 'name' property
     const testNames = Testes.Testes.map((test) => test.name);
@@ -110,14 +131,14 @@ function Runtest() {
     setActiveTestIndex((prevIndex) => (prevIndex + 1) % Testes.Testes.length);
     setTestName(exp[index]);
   };
-  const handleConnect = async()=>{
+  const handleConnect = async () => {
     try {
-      const res = await publicRequest.post('/connect/01:23:45:67:99:E3')
-      console.log(res)
+      const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
+      console.log(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   useEffect(() => {
     // This useEffect will be triggered when either `index` or `testName` changes.
     // We'll check if both `index` and `testName` are updated before proceeding to set the `verificationText`.
@@ -185,53 +206,87 @@ function Runtest() {
         <InnerContainer1>
           <Card1Container1>
             <MenuCard1>
-              <Text>Test sequence</Text>
-              <StyledSelect
-                onChange={(e) => setType(e.target.value)}
-                value={type}
-              >
-                <option value="Test">Test</option>
-                <option value="t2"> t1</option>
-                <option value="t3"> t2</option>
-                <option value="t4">t3 </option>
-              </StyledSelect>
-              <Text>Model #</Text>
-              <LabelModel value={inputValue} onChange={handleChange} />
-              <Text>Serial #</Text>
-              <LabelSerial value={inputValue} onChange={handleChange} />
-              <Text>Mac #</Text>
-              <LabelMac value={inputValue} onChange={handleChange} />
+              <CardItem>
+                <Text>Test sequence</Text>
+                <StyledSelect
+                  onChange={(e) => setType(e.target.value)}
+                  value={type}
+                >
+                  <option value="Test">Test</option>
+                  <option value="t2"> t1</option>
+                  <option value="t3"> t2</option>
+                  <option value="t4">t3 </option>
+                </StyledSelect>
+              </CardItem>
+              <CardItem>
+                <Text>Model #</Text>
+                <LabelModel
+                  value={inputValue}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CardItem>
+              <CardItem>
+                <Text>Serial #</Text>
+                <LabelSerial
+                  value={inputValue}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CardItem>
+
+              <CardItem>
+                <Text>Mac #</Text>
+                <LabelMac value={inputValue} onChange={handleChange} disabled />
+              </CardItem>
             </MenuCard1>
             <Card1>
-              <InnerDiv1Card1>
-                <ButtonRun onClick={handleFetch}>
-                  run
-                  <Run />
-                </ButtonRun>
-              </InnerDiv1Card1>
-              <InnerDiv2Card1>
-                <LabelEta value={inputValue} onChange={handleChange} />
-
-                <divTextProg>
-                  <TextScrole>Overal Progress</TextScrole>
-                  <ProgressBarContainer1>
-                    <ProgressBar1 progress={progress} />
-                  </ProgressBarContainer1>
-                </divTextProg>
-                <InnerButton>
-                  <Button>save as CSV</Button>
-                  <Button>Save as PDF</Button>
-                  <Button>Print</Button>
-                </InnerButton>
-              </InnerDiv2Card1>
+              <InnerDivCard1>
+                <InnerDiv1Card1>
+                  <ButtonRun onClick={handleFetch}>
+                    RUN
+                    <Run />
+                  </ButtonRun>
+                  <LabelEta
+                    value={inputValue}
+                    onChange={handleChange}
+                    disabled
+                  />
+                </InnerDiv1Card1>
+                <InnerDiv2Card1>
+                  <DivTextProg>
+                    <TextScrole>Overall Progress</TextScrole>
+                    <ProgressBarContainer1>
+                      <ProgressBar1 progress={progress} />
+                    </ProgressBarContainer1>
+                  </DivTextProg>
+                  <InnerButton>
+                    <Button>save as CSV</Button>
+                    <Button>Save as PDF</Button>
+                    <Button>Print</Button>
+                  </InnerButton>
+                </InnerDiv2Card1>
+              </InnerDivCard1>
               <InnerDiv3Card1>
                 <Text>Qte Totale testee</Text>
-                <Label type="text" value={inputValue} onChange={handleChange} />
+                <LabelTotal
+                  type="text"
+                  value={inputValue}
+                  onChange={handleChange}
+                />
 
                 <Text>Qte Totale OK</Text>
-                <Label type="text" value={inputValue} onChange={handleChange} />
+                <LabelTotalOk
+                  type="text"
+                  value={inputValue}
+                  onChange={handleChange}
+                />
                 <Text>Qte Totale NOK</Text>
-                <Label type="text" value={inputValue} onChange={handleChange} />
+                <LabelTotalNot
+                  type="text"
+                  value={inputValue}
+                  onChange={handleChange}
+                />
               </InnerDiv3Card1>
             </Card1>
           </Card1Container1>
@@ -239,28 +294,67 @@ function Runtest() {
             <Table>
               <tbody>
                 {testNames.map((testName, index) => (
-                  <Tr key={index} active={index === activeTestIndex}>
-                    <Td>Étape {index + 1}:</Td>
-                    <Td>{testName}</Td>
+                  <Tr key={index} active={index === activeTestIndex}> 
+                    <TextField>
+                      Étape {index + 1}: {testName}
+                    </TextField>
                   </Tr>
                 ))}
               </tbody>
             </Table>
           </Step>
         </InnerContainer1>
-        {showPopup && (
-          <DivVerifier>
-            <TextInsideBorder>Operator Instructions</TextInsideBorder>
-            <TextVerif>{verificationText}</TextVerif>
-            {!showMessage && !hideButtons && (
-              <CardButton>
-                <IconCheck onClick={() => handleChangeExp()} />
-                <IconX onClick={handlePopupClose} />
-              </CardButton>
-            )}
-          </DivVerifier>
-        )}
+        <InnerContainer2>
+          <Card1Container2>
+            <Menu1Card2>
+              <CardItem2>
+                <Text>
+                Étape {index} : <Green>{testNames[index-1]}</Green>
+                </Text>
+              </CardItem2>
+              <CardItem3>
+                <TextScrole1>Step Progress</TextScrole1>
+                <ProgressBarContainer1>
+                  <ProgressBar1 progress={progress} />
+                </ProgressBarContainer1>
+              </CardItem3>
+              <CardItem4>
+                <Text>Activity</Text>
+                <LabelMac value={inputValue} onChange={handleChange} />
+              </CardItem4>
+              <CardItem5>
+                <LabelEta2 value={inputValue} onChange={handleChange} />
+              </CardItem5>
+            </Menu1Card2>
+            <InnerDivCard2>
+              <Outer>
+                <Inner>Volts</Inner>
+                <H3>3835 MV</H3>
+              </Outer>
+              <Outer>
+                <Inner>Volts</Inner>
+                <H3>3835 MV</H3>
+              </Outer>
+              <Outer>
+                <Inner>Volts</Inner>
+                <H3>3835 MV</H3>
+              </Outer>
+            </InnerDivCard2>
+          </Card1Container2>
+        </InnerContainer2>
       </Container1>
+      {showPopup && (
+        <DivVerifier>
+          <TextInsideBorder>Operator Instructions</TextInsideBorder>
+          <TextVerif>{verificationText}</TextVerif>
+          {!showMessage && !hideButtons && (
+            <CardButton>
+              <IconX onClick={handlePopupClose} />
+              <IconCheck onClick={() => handleChangeExp()} />
+            </CardButton>
+          )}
+        </DivVerifier>
+      )}
     </MainContainer>
   );
 }

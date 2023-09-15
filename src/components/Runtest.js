@@ -28,7 +28,6 @@ import {
   ProgressBarContainer1,
   ProgressBar1,
   ProgressBarContainer,
-  ProgressBar,
   Card2,
   Electric,
   Container2,
@@ -76,61 +75,136 @@ import {
   LabelTotalNot,
   Green,
   TextScrole1,
+  CardProgress,
+  IconCheckDisabled,IconXDisabled
 } from "../styled-components/StylerunTest";
 import { publicRequest } from "../requestMethod";
+import CircularProgressBar from "./CircularProgressBar";
+import ProgressBarLine from "./ProgressBar";
+import ProgressAll from "./ProgressAll";
+import CircularProgressBarFaild from "./CircularProgressBarFaild";
+import ProgressBarLineFaild from "./ProgressBarFaild";
+import { toast } from "react-toastify";
+
 
 function Runtest() {
+  const [data, setData] = useState([]);
+  const [globalData, setGlobalData] = useState({
+    // Initialize globalData with res.data[0]
+    tests: [], // Initialize the tests property as an empty array
+  });
+
+  const [activeTestIndex, setActiveTestIndex] = useState(0);
+  const [showMessage, setShowMessage] = useState(true);
+  const [tram, setTram] = useState({});
+
   const [inputValue, setInputValue] = useState();
   const [progress, setProgress] = useState(0);
   const [type, setType] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [serial, setSerial] = useState("");
   const [hideButtons, setHideButtons] = useState(false);
-  const [data, setData] = useState({});
-  const [showMessage, setShowMessage] = useState(true);
-  const [testName, setTestName] = useState("");
-  const [testNames, setTestNames] = useState([]);
-  const [StategtName, setStatgetName] = useState([]);
-  const [clicked, setClicked] = useState(false);
-  const [toggle1, setToggle1] = useState(false);
-  const [StatGetData, setGetData] = useState([]);
-  const [activeTestIndex, setActiveTestIndex] = useState(0);
 
-  const handleFetchData = async () => {
+  const [progressActive, setProgressActive] = useState(false);
+  const [progressActiveX, setProgressActiveX] = useState(false);
+  const [iconCheckDisabled, setIconCheckDisabled] = useState(false);
+  const [iconXDisabled, setIconXDisabled] = useState(false);
+
+  const [succes,setSucces] =useState("")
+  const [faild,setFaild] =useState("")
+  const [showLabel, setShowLabel] = useState("");
+  const [allValue, setAllValue] = useState("");
+
+
+
+ /*  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await publicRequest.get("/getAllTests");
+        setData(res.data);
+        
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getData();
+  }, []); */
+
+
+  const sendGlobalDataToBackend = async () => {
     try {
-      const response = await publicRequest.get("/getAllTests");
-      console.log(response);
-      const testnames = response.data.map((test) => test.name);
-      setTestNames(testnames);
+      // Remove the specified properties from each test object in globalData.tests
+      const testsWithoutSpecifiedProps = globalData.tests.map((test) => {
+        const { name, description, __v, etat, ...rest } = test; // Destructure specified props and collect the rest of the properties
+        return { ...rest, testId: test._id }; // Return the test object without specified props and with testId property
+      });
+  
+      // Create a new globalData object without the specified props in tests
+      const updatedGlobalData = {
+        ...globalData,
+        tests: testsWithoutSpecifiedProps,
+        serialNumber: "Not Added", // Add the serialNumber property//must remove after test important!!!!
+      };
+  
+      // Send the updated globalData to the backend
+      const res = await publicRequest.post("/add-test-result", updatedGlobalData); // Adjust the endpoint URL as needed
+      
+      toast.success("data send successfully");
     } catch (error) {
-      console.log(error);
+      console.error("Error sending global data to backend:", error);
     }
   };
+  
+  
+  
+  
   useEffect(() => {
-    handleFetchData();
-  }, []);
-  useEffect(() => {
-    // Assuming 'Tests' is an array containing test objects with a 'name' property
-    const testNames = Testes.Testes.map((test) => test.name);
-  }, []);
-
-  const [verificationText, setVerificationText] = useState(
-    Testes.Testes[0].description
-  );
-  const [index, setIndex] = useState(1);
-  const exp = ["test1", "test2", "test3", "test4"];
-  const handleChangeExp = async () => {
-    try {
-      const res = await publicRequest.get("/getAllTests");
-      setGetData(res.data);
-    } catch (e) {
-      console.log("error");
+    const getData = async () => {
+      try {
+        const res = await publicRequest.get(`/get-test-by-name${type ? "?nameQuery=" + type : ""}`);
+        if (res.data && res.data.length > 0 && res.data[0].tests) {
+          const testsWithResult = res.data[0].tests.map((test) => ({
+            ...test,
+            result: "", // Default value
+          }))/* .map(({name,description,__v,etat, ...testWithoutEtat }) => testWithoutEtat); // Remove the etat property */
+         
+          setGlobalData({
+            ...res.data[0],
+            tests: testsWithResult, // Update the tests property with the new data
+          });
+          setData(testsWithResult);
+      
+          setActiveTestIndex(0);
+          setSucces("");
+          setFaild("");
+          setAllValue("");
+          setShowLabel("")
+        } else {
+          // Handle the case where the data structure is not as expected
+          setData([]);
+          setActiveTestIndex(0);
+          setSucces("");
+          setFaild("");
+          setAllValue("");
+          setShowLabel("")
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getData();
+  }, [type]);
+  
+  
+  
+  // Function to go back to the previous item
+  const goBackToPreviousItem = () => {
+    // Check if there's a previous item in 'data'
+    if (activeTestIndex > 0) {
+      setActiveTestIndex(activeTestIndex - 1);
     }
-
-    setIndex(index + 1);
-    setActiveTestIndex((prevIndex) => (prevIndex + 1) % Testes.Testes.length);
-    setTestName(exp[index]);
   };
+
   const handleConnect = async () => {
     try {
       const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
@@ -139,43 +213,52 @@ function Runtest() {
       console.log(error);
     }
   };
-  useEffect(() => {
-    // This useEffect will be triggered when either `index` or `testName` changes.
-    // We'll check if both `index` and `testName` are updated before proceeding to set the `verificationText`.
-    if (index !== 0 && testName !== "") {
-      const test = Testes.Testes.find((test) => test.name === testName);
-      if (test) {
-        setVerificationText(test.description);
-        if (test.name === "test3") {
-          setShowMessage(true); // Show the message for test3
-          setHideButtons(true);
-          setVerificationText("Connexion en cours...");
-          handleConnect();
-          setTimeout(() => {
-            setShowMessage(!showMessage); // Hide the message after 4 seconds
-            setHideButtons(false);
-            setVerificationText(test.description);
-          }, 6000);
-        }
-      }
-    }
-  }, [index, testName]);
+
+  const [verificationText, setVerificationText] = useState(
+    data.length > 0 ? data[0].description : ""
+  );
+
   // Function to hide the message after 3 seconds
   const hideMessage = () => {
     setShowMessage(false);
   };
   // Call the hideMessage function after 3 seconds (3000 milliseconds)
   setTimeout(hideMessage, 3000);
+
+  useEffect(() => {
+    // This useEffect will be triggered when the component mounts.
+
+    const test = data[activeTestIndex]; // Get the current test based on activeTestIndex
+    if (test) {
+      setVerificationText(test.description);
+
+      /* if (data.length > 0 && activeTestIndex === data.length - 1) {
+        setShowMessage(true); // Show the message for the last test
+        setHideButtons(true);
+        setVerificationText("Connexion en cours...");
+        handleConnect();
+
+        setTimeout(() => {
+          
+          setShowMessage(false); // Hide the message after 4 seconds
+          setHideButtons(false);
+          setVerificationText(test.description);
+        }, 6000);
+      } */
+    }
+  }, [activeTestIndex, data, handleConnect]);
+
   // get the scan
   const handleFetch = async () => {
     try {
-      const data = await publicRequest.get("/tram/COM9");
-      console.log(data);
-      setData(data.data);
+      const tram = await publicRequest.get("/tram/COM9");
+      console.log(tram);
+      setTram(tram.data);
     } catch (error) {
       console.log(error);
     }
   };
+
   // Simulating progress completion
   useEffect(() => {
     const interval = setInterval(() => {
@@ -195,11 +278,88 @@ function Runtest() {
   const handlePopupClose = () => {
     setShowPopup(false);
   };
-  /*************************************** */
 
   const handleChange = (e) => {
     setInputValue(e.target.value);
   };
+
+  
+
+  const advanceToNextItem = () => {
+    if (!progressActive && !iconCheckDisabled) {
+      setProgressActive(true);
+      setIconCheckDisabled(true);
+      setSucces("");
+      setFaild(""); // Clear the faild text
+
+      // Simulate a 10-second progress
+      setTimeout(() => {
+        setSucces("Step Resultat Pass");
+        setShowLabel("succes"); // Show the success label
+        setProgressActive(false);
+        setIconCheckDisabled(false);
+
+        if (activeTestIndex < data.length) {
+          // Update the result property to "Pass" for the current test
+          const updatedData = [...data];
+          updatedData[activeTestIndex].result = "pass";
+          setData(updatedData);
+          
+          setActiveTestIndex(activeTestIndex + 1);
+        }
+
+        if (activeTestIndex === data.length - 1) {
+          setAllValue("Overall Pass");
+          // Update globalData with the new data
+          const updatedGlobalData = { ...globalData, tests: [...data] };
+          setGlobalData(updatedGlobalData);
+           // Send globalData to the backend after all updates
+          sendGlobalDataToBackend();
+         
+        }
+      }, 10000); // 10 seconds in milliseconds
+    }
+  };
+
+  const advanceToNextItemX = () => {
+    if (!progressActiveX && !iconXDisabled) {
+      setProgressActiveX(true);
+      setIconXDisabled(true);
+      setFaild("");
+      setSucces(""); // Clear the success text
+
+      // Simulate a 10-second progress
+      setTimeout(() => {
+        setFaild("Step Resultat Faild");
+        setShowLabel("faild"); // Show the faild label
+        setProgressActiveX(false);
+        setIconXDisabled(false);
+
+        if (activeTestIndex < data.length) {
+          // Update the result property to "Fail" for the current test
+          const updatedData = [...data];
+          updatedData[activeTestIndex].result = "fail";
+          setData(updatedData);
+
+          setActiveTestIndex(activeTestIndex + 1);
+        }
+
+        if (activeTestIndex === data.length - 1) {
+          setAllValue("Overall Faild");
+          // Update globalData with the new data
+          const updatedGlobalData = { ...globalData, tests: [...data] };
+          setGlobalData(updatedGlobalData);
+           // Send globalData to the backend after all updates
+          sendGlobalDataToBackend();
+        }
+      }, 10000); // 10 seconds in milliseconds
+    }
+  };
+
+  
+  
+
+
   return (
     <MainContainer>
       <Container1>
@@ -212,10 +372,10 @@ function Runtest() {
                   onChange={(e) => setType(e.target.value)}
                   value={type}
                 >
-                  <option value="Test">Test</option>
-                  <option value="t2"> t1</option>
-                  <option value="t3"> t2</option>
-                  <option value="t4">t3 </option>
+                  <option value="Test">Test Mode</option>
+                  <option value="GO">GO</option>
+                  <option value="Preste">Preste</option>
+                  <option value="Rival">Rival</option>
                 </StyledSelect>
               </CardItem>
               <CardItem>
@@ -248,16 +408,32 @@ function Runtest() {
                     <Run />
                   </ButtonRun>
                   <LabelEta
-                    value={inputValue}
-                    onChange={handleChange}
+                    value={allValue}
                     disabled
+                    style={{
+                      color:
+                        allValue === "Overall Pass"
+                          ? "green"
+                          : allValue === "Overall Faild"
+                          ? "red"
+                          : "black",
+                      border:
+                        allValue === "Overall Pass"
+                          ? "4px solid #32CD32"
+                          : allValue === "Overall Faild"
+                          ? "4px solid #FF0000"
+                          : "4px solid grey",
+                    }}
                   />
                 </InnerDiv1Card1>
                 <InnerDiv2Card1>
                   <DivTextProg>
                     <TextScrole>Overall Progress</TextScrole>
                     <ProgressBarContainer1>
-                      <ProgressBar1 progress={progress} />
+                      <ProgressAll
+                        data={data}
+                        activeTestIndex={activeTestIndex}
+                      />
                     </ProgressBarContainer1>
                   </DivTextProg>
                   <InnerButton>
@@ -293,10 +469,19 @@ function Runtest() {
           <Step>
             <Table>
               <tbody>
-                {testNames.map((testName, index) => (
-                  <Tr key={index} active={index === activeTestIndex}> 
-                    <TextField>
-                      Étape {index + 1}: {testName}
+                {data.map((testName, index) => (
+                  <Tr key={testName._id} active={index === activeTestIndex}>
+                    <TextField
+                      style={{
+                        color:
+                          testName.result === "fail"
+                            ? "#FF0000"
+                            : testName.result === "pass"
+                            ? "#32CD32"
+                            : "inherit",
+                      }}
+                    >
+                      Étape {index + 1}: {testName.name}
                     </TextField>
                   </Tr>
                 ))}
@@ -309,21 +494,50 @@ function Runtest() {
             <Menu1Card2>
               <CardItem2>
                 <Text>
-                Étape {index} : <Green>{testNames[index-1]}</Green>
+                  {data[activeTestIndex] && (
+                    <Green
+                      style={{
+                        color:
+                          data[activeTestIndex].result === "fail"
+                            ? "#FF0000"
+                            : data[activeTestIndex].result === "pass"
+                            ? "#32CD32"
+                            : "inherit",
+                      }}
+                    >
+                      Étape {activeTestIndex + 1}: {data[activeTestIndex].name}
+                    </Green>
+                  )}
                 </Text>
               </CardItem2>
               <CardItem3>
                 <TextScrole1>Step Progress</TextScrole1>
                 <ProgressBarContainer1>
-                  <ProgressBar1 progress={progress} />
+                  {progressActive ? (
+                    <ProgressBarLine />
+                  ) : progressActiveX ? (
+                    <ProgressBarLineFaild />
+                  ) : null}
                 </ProgressBarContainer1>
               </CardItem3>
-              <CardItem4>
-                <Text>Activity</Text>
-                <LabelMac value={inputValue} onChange={handleChange} />
-              </CardItem4>
+
               <CardItem5>
-                <LabelEta2 value={inputValue} onChange={handleChange} />
+                <LabelEta2
+                  value={showLabel === "faild" ? faild : succes}
+                  disabled
+                  style={{
+                    border: showLabel
+                      ? showLabel === "faild"
+                        ? "4px solid  #FF0000"
+                        : "4px solid #32CD32"
+                      : "4px solid grey",
+                    color: showLabel
+                      ? showLabel === "faild"
+                        ? "#FF0000"
+                        : "#32CD32"
+                      : "black",
+                  }}
+                />
               </CardItem5>
             </Menu1Card2>
             <InnerDivCard2>
@@ -349,8 +563,35 @@ function Runtest() {
           <TextVerif>{verificationText}</TextVerif>
           {!showMessage && !hideButtons && (
             <CardButton>
-              <IconX onClick={handlePopupClose} />
-              <IconCheck onClick={() => handleChangeExp()} />
+              <CardProgress>
+                {iconXDisabled ? (
+                  <IconXDisabled
+                    onClick={advanceToNextItemX}
+                    disabled={iconXDisabled}
+                  />
+                ) : (
+                  <IconX
+                    onClick={advanceToNextItemX}
+                    disabled={iconXDisabled}
+                  />
+                )}
+                {progressActiveX && <CircularProgressBarFaild />}
+              </CardProgress>
+
+              <CardProgress>
+                {iconCheckDisabled ? (
+                  <IconCheckDisabled
+                    onClick={advanceToNextItem}
+                    disabled={iconCheckDisabled}
+                  />
+                ) : (
+                  <IconCheck
+                    onClick={advanceToNextItem}
+                    disabled={iconCheckDisabled}
+                  />
+                )}
+                {progressActive && <CircularProgressBar />}
+              </CardProgress>
             </CardButton>
           )}
         </DivVerifier>

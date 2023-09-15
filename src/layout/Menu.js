@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link } from 'react-router-dom';
+
 import {
   MenuContainer,
   MenuItem,
@@ -18,88 +19,76 @@ import Runtest from '../components/Runtest';
 
 function Menu({ child }) {
   const [activeMenuItem, setActiveMenuItem] = useState(0);
-  const handleMenuItemClick = (index) => {
+  const [userRole, setUserRole] = useState("admin"); // Set the user's role
 
+  // Define a mapping of menu items to user roles
+  const menuItems = [
+    {
+      role: ["super-admin", "admin"],
+      text: "System Configure",
+      icon: <StyledAiTwotoneTool />,
+      to: "/sys",
+    },
+    {
+      role: ["super-admin", "admin", "expert"],
+      text: "Test Sequence",
+      icon: <StyledCgPlayListCheck />,
+      to: "#test",
+    },
+    {
+      role: ["super-admin", "admin", "expert", "operator"],
+      text: "Run Test Sequence",
+      icon: <StyledVscDebugStart />,
+      to: "/accueil",
+    },
+    {
+      role: ["super-admin", "admin"],
+      text: "Admin",
+      icon: <StyledFaHome />,
+      to: "#admin2",
+    },
+    {
+      role: ["super-admin", "admin", "expert"],
+      text: "Reports",
+      icon: <StyledFiLogOut />,
+      to: "#Users",
+    },
+    // Add other menu items here
+  ];
+
+  const filteredMenuItems = menuItems.filter((item) =>
+    item.role.includes(userRole)
+  );
+
+  const handleMenuItemClick = (index) => {
     setActiveMenuItem(index);
-    
   };
-  
 
   return (
     <>
       <MenuContainer active={activeMenuItem === 0}>
-        {/* Use Link component with 'to' prop for navigation */}
-        <MenuItem
-          as={Link}
-          to="/accueil"
-          active={activeMenuItem === 0}
-          onClick={() => handleMenuItemClick(0)}
-        >
-          <Container>
-            <StyledAiTwotoneTool />
-            <Textmenu>System Configure</Textmenu>
-          </Container>
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to="#test"
-          active={activeMenuItem === 1}
-          onClick={() => handleMenuItemClick(1)}
-        >
-          <Container>
-            <StyledCgPlayListCheck />
-            <Textmenu>Test Sequence</Textmenu>
-          </Container>
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to="#services"
-          active={activeMenuItem === 2}
-          onClick={() => handleMenuItemClick(2)}
-        >
-          <Container>
-            <StyledVscDebugStart />
-            <Textmenu>Run Test Sequence</Textmenu>
-          </Container>
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to="#Users"
-          active={activeMenuItem === 3}
-          onClick={() => handleMenuItemClick(3)}
-        >
-          <Container>
-            <StyledFiLogOut />
-            <Textmenu>Reports</Textmenu>
-          </Container>
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to="#admin"
-          active={activeMenuItem === 4}
-          onClick={() => handleMenuItemClick(4)}
-        >
-          <Container>
-            <StyledMdSettingsSuggest />
-            <Textmenu>Utilities</Textmenu>
-          </Container>
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to="#admin2"
-          active={activeMenuItem === 5}
-          onClick={() => handleMenuItemClick(5)}
-        >
-          <Container>
-            <StyledFaHome />
-            <Textmenu>Admin</Textmenu>
-          </Container>
-        </MenuItem>
-        
+        {filteredMenuItems.map((item, index) => (
+          <MenuItem
+            key={index}
+            as={Link}
+            to={item.to}
+            active={activeMenuItem === index}
+            onClick={() => handleMenuItemClick(index)}
+          >
+            <Container>
+              {item.icon}
+              <Textmenu>{item.text}</Textmenu>
+            </Container>
+          </MenuItem>
+        ))}
       </MenuContainer>
-      {child}
+        {child}
     </>
   );
 }
 
 export default Menu;
+
+
+
+

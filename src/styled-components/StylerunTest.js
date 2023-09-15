@@ -500,6 +500,11 @@ export const TextVerif = styled.p`
   margin-top: 5px;
 `;
 
+export const IconCheckDisabled = styled(BsFillCheckCircleFill)`
+ color: gray;
+  font-size: 60px;
+  cursor: pointer;
+`;
 export const IconCheck = styled(BsFillCheckCircleFill)`
  color: green;
   font-size: 60px;
@@ -508,6 +513,11 @@ export const IconCheck = styled(BsFillCheckCircleFill)`
 
 export const IconX = styled(BsXCircleFill)`
   color: red;
+  font-size: 60px;
+  cursor: pointer;
+`;
+export const IconXDisabled = styled(BsXCircleFill)`
+   color: gray;
   font-size: 60px;
   cursor: pointer;
 `;
@@ -643,14 +653,14 @@ flex-direction: row;
 height: 38px;
 justify-content: space-between;
 
-padding:12px 10px;
+padding:12px 30px;
 `;
 export const CardItem2 = styled.div`
 flex-direction: row;
 display: flex;
 justify-content: space-between;
 align-items: center;
-width: 60%;
+width: 30%;
 gap:5px;
 padding: 10px;
 `
@@ -659,19 +669,19 @@ flex-direction: row;
 display: flex;
 justify-content: space-between;
 align-items: center;
-width: 200%;
-gap:10px;
+width: 100%;
+
 padding: 10px;
 `
-export const CardItem4 = styled.div`
+/* export const CardItem4 = styled.div`
 flex-direction: row;
 display: flex;
 justify-content: space-between;
 align-items: center;
-width: 120%;
+width: 20%;
 gap:5px;
 padding: 10px;
-`
+` */
 export const CardItem5 = styled.div`
 flex-direction: row;
 display: flex;
@@ -679,11 +689,11 @@ justify-content: space-between;
 align-items: center;
 gap:5px;
 padding: 10px;
+margin:0px 20px;
 `
 export const LabelEta2 = styled.input`
   padding: 7px 4px;
-  border: 4px solid #32CD32; /* Corrected border syntax */
-  color: #32CD32;
+  
   font-size: 15px;
   text-align: center ;
   background-color: #ffff;
@@ -733,3 +743,14 @@ export const H3 = styled.h3`
  margin-top: -6px; /* Remove default margin to avoid extra spacing */
 color: #37378E;
 `
+
+
+export const CardProgress = styled.div`
+display: flex;
+flex-direction: row;
+align-items: center;
+gap: 15px;
+ 
+`
+
+

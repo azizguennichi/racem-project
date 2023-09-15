@@ -10,6 +10,7 @@ import NavRigas from "./layout/NavRigas";
 import Runtest from "./components/Runtest";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SysConf from "./components/SysConf";
 
 function App() {
   return (
@@ -34,6 +35,10 @@ function App() {
         <Route
           path="/accueil"
           element={<NavRigas child={<Menu child={<Runtest />} />} />}
+        />
+         <Route
+          path="/sys"
+          element={<NavRigas child={<Menu child={<SysConf />} />} />}
         />
       </Routes>
       <ToastContainer theme="colored" position="top-center" />

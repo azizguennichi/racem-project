@@ -19,9 +19,13 @@ import {
   TextLog,
   ContainerText
 } from "../styled-components/StyelNAvrigas";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutSuccess } from "../redux/apiCalls";
 function NavRigas({ child }) {
+  const currentUser = useSelector((state) => state.user.currentUser);
+
+  console.log(currentUser)
+
   const dispatch = useDispatch();
   const logoutHandler = (e) => {
     e.preventDefault();
@@ -46,9 +50,9 @@ function NavRigas({ child }) {
             <ContainerUser>
               <ContainerText>
             <TextLog>Logged in as</TextLog>
-              <TextUser>XXXXXXX</TextUser>
+              <TextUser>{currentUser.firstName}</TextUser>
               </ContainerText>
-              <TextRol>(Admin)</TextRol>
+              <TextRol>({currentUser.role})</TextRol>
             </ContainerUser>
           </NavUser>
         </CardNav>

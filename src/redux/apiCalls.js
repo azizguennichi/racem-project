@@ -1,12 +1,16 @@
 import { publicRequest } from "../requestMethod";
 import { loginFailed, loginStart, loginSuccess, logout } from "./userSlice";
 import { toast } from "react-toastify";
+import jwt_decode from "jwt-decode";
+
 
 export const login = async (dispatch, user) => {
   dispatch(loginStart());
   try {
     const result = await publicRequest.post("/login", user);
-    dispatch(loginSuccess(result.data));
+    const token = result.data.accessToken;
+    const decoded = jwt_decode(token)
+    dispatch(loginSuccess(decoded));
     toast.success("Login success");
     setTimeout(() => {
       window.location.href = "/adduser";

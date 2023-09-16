@@ -95,7 +95,7 @@ function Runtest() {
   });
 
   const [activeTestIndex, setActiveTestIndex] = useState(0);
-  const [showMessage, setShowMessage] = useState(true);
+  
   const [tram, setTram] = useState({});
 
   const [inputValue, setInputValue] = useState();
@@ -115,20 +115,8 @@ function Runtest() {
   const [showLabel, setShowLabel] = useState("");
   const [allValue, setAllValue] = useState("");
 
-
-
- /*  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await publicRequest.get("/getAllTests");
-        setData(res.data);
-        
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getData();
-  }, []); */
+  const [testFailed, setTestFailed] = useState(false);
+  const [errorToastShown, setErrorToastShown] = useState(false);
 
 
   const sendGlobalDataToBackend = async () => {
@@ -197,67 +185,123 @@ function Runtest() {
   
   
   
-  // Function to go back to the previous item
-  const goBackToPreviousItem = () => {
-    // Check if there's a previous item in 'data'
-    if (activeTestIndex > 0) {
-      setActiveTestIndex(activeTestIndex - 1);
-    }
-  };
+// Modify handleConnect
+const handleConnect = async () => {
+  try {
+    const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
+    console.log(res);
 
-  const handleConnect = async () => {
-    try {
-      const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
-      console.log(res);
-    } catch (error) {
-      console.log(error);
+    // Handle successful connection here
+
+    // If the connection is successful, update the flag and reset the tests
+    setTestFailed(false);
+    setFaild("");
+    setProgressActiveX(false);
+    
+    // Update the result property to "Pass" for all tests in data
+    const updatedData = data.map((test) => ({
+      ...test,
+      result: "pass",
+    }));
+    setData(updatedData);
+  } catch (error) {
+    console.log(error);
+    if (!errorToastShown) {
+      toast.error("Connection Failed");
+      setErrorToastShown(true);
     }
-  };
+
+    // If the connection fails, set the flag and fail all tests
+    setTestFailed(true);
+    setFaild("Connection Failed");
+    setProgressActiveX(false);
+    setAllValue("Overall Failed");
+
+    // Update the result property to "Fail" for all tests in data
+    const updatedData = data.map((test) => ({
+      ...test,
+      result: "fail",
+    }));
+    setData(updatedData);
+  }
+};
 
   const [verificationText, setVerificationText] = useState(
     data.length > 0 ? data[0].description : ""
   );
 
-  // Function to hide the message after 3 seconds
-  const hideMessage = () => {
-    setShowMessage(false);
-  };
-  // Call the hideMessage function after 3 seconds (3000 milliseconds)
-  setTimeout(hideMessage, 3000);
+  
+  // Modify handleFetch
+const handleFetch = async () => {
+  try {
+    const tram = await publicRequest.get("/tram/COM9");
+    console.log(tram);
+    setTestFailed(false);
+    // Handle successful fetch here
+  } catch (error) {
+    console.log(error);
+    if (!errorToastShown) {
+      toast.error("Loading Failed");
+      setErrorToastShown(true);
+    }
+    // If the connection fails, set the flag and fail all tests
+    setTestFailed(true);
+    setFaild("Connection Failed");
+    setProgressActiveX(false);
+    setAllValue("Overall Failed");
 
+    // Update the result property to "Fail" for all tests in data
+    const updatedData = data.map((test) => ({
+      ...test,
+      result: "fail",
+    }));
+    setData(updatedData);
+    setTestFailed(true);
+  }
+};
+  
+  // Now define your useEffect
   useEffect(() => {
-    // This useEffect will be triggered when the component mounts.
-
+    // Your existing useEffect code
     const test = data[activeTestIndex]; // Get the current test based on activeTestIndex
     if (test) {
       setVerificationText(test.description);
-
-      /* if (data.length > 0 && activeTestIndex === data.length - 1) {
-        setShowMessage(true); // Show the message for the last test
-        setHideButtons(true);
-        setVerificationText("Connexion en cours...");
-        handleConnect();
-
-        setTimeout(() => {
+  
+      if (data.length > 0) {
+        if (activeTestIndex === 11) {
+          // Trigger handleConnect when activeTestIndex is 3
           
-          setShowMessage(false); // Hide the message after 4 seconds
+          setHideButtons(true);
+          setVerificationText("Connexion en cours...");
+          handleConnect();
+          // You may want to add a delay for handleConnect actions
+          setTimeout(() => {
+             
+            setHideButtons(false);
+            setVerificationText(test.description);
+          }, 6000);
+        } else if (activeTestIndex === 10) {
+          // Trigger handleFetch when activeTestIndex is 4
+          
+          setHideButtons(true);
+          setVerificationText("Fetching data...");
+          handleFetch();
+          // You may want to add a delay for handleFetch actions
+          setTimeout(() => {
+          
+            setHideButtons(false);
+            setVerificationText(test.description);
+          }, 6000);
+        } else {
+          // Handle other cases where you don't need to trigger any actions
+          
           setHideButtons(false);
-          setVerificationText(test.description);
-        }, 6000);
-      } */
+        }
+      }
     }
-  }, [activeTestIndex, data, handleConnect]);
-
-  // get the scan
-  const handleFetch = async () => {
-    try {
-      const tram = await publicRequest.get("/tram/COM9");
-      console.log(tram);
-      setTram(tram.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }, [activeTestIndex, data, handleConnect, handleFetch]); // Include handleFetch in the dependency array
+  
+  
 
   // Simulating progress completion
   useEffect(() => {
@@ -285,6 +329,7 @@ function Runtest() {
 
   
 
+  // In advanceToNextItemX, check the progressActiveX flag
   const advanceToNextItem = () => {
     if (!progressActive && !iconCheckDisabled) {
       setProgressActive(true);
@@ -330,8 +375,8 @@ function Runtest() {
 
       // Simulate a 10-second progress
       setTimeout(() => {
-        setFaild("Step Resultat Faild");
-        setShowLabel("faild"); // Show the faild label
+        setFaild("Step Resultat Failed");
+        setShowLabel("Failed"); // Show the faild label
         setProgressActiveX(false);
         setIconXDisabled(false);
 
@@ -345,7 +390,7 @@ function Runtest() {
         }
 
         if (activeTestIndex === data.length - 1) {
-          setAllValue("Overall Faild");
+          setAllValue("Overall Failed");
           // Update globalData with the new data
           const updatedGlobalData = { ...globalData, tests: [...data] };
           setGlobalData(updatedGlobalData);
@@ -355,6 +400,7 @@ function Runtest() {
       }, 10000); // 10 seconds in milliseconds
     }
   };
+
 
   
   
@@ -414,13 +460,13 @@ function Runtest() {
                       color:
                         allValue === "Overall Pass"
                           ? "green"
-                          : allValue === "Overall Faild"
+                          : allValue === "Overall Failed"
                           ? "red"
                           : "black",
                       border:
                         allValue === "Overall Pass"
                           ? "4px solid #32CD32"
-                          : allValue === "Overall Faild"
+                          : allValue === "Overall Failed"
                           ? "4px solid #FF0000"
                           : "4px solid grey",
                     }}
@@ -433,6 +479,7 @@ function Runtest() {
                       <ProgressAll
                         data={data}
                         activeTestIndex={activeTestIndex}
+                        testFailed={testFailed}
                       />
                     </ProgressBarContainer1>
                   </DivTextProg>
@@ -523,16 +570,16 @@ function Runtest() {
 
               <CardItem5>
                 <LabelEta2
-                  value={showLabel === "faild" ? faild : succes}
+                  value={showLabel === "Failed" ? faild : succes}
                   disabled
                   style={{
                     border: showLabel
-                      ? showLabel === "faild"
+                      ? showLabel === "Failed"
                         ? "4px solid  #FF0000"
                         : "4px solid #32CD32"
                       : "4px solid grey",
                     color: showLabel
-                      ? showLabel === "faild"
+                      ? showLabel === "Failed"
                         ? "#FF0000"
                         : "#32CD32"
                       : "black",
@@ -561,7 +608,7 @@ function Runtest() {
         <DivVerifier>
           <TextInsideBorder>Operator Instructions</TextInsideBorder>
           <TextVerif>{verificationText}</TextVerif>
-          {!showMessage && !hideButtons && (
+          {!hideButtons && (
             <CardButton>
               <CardProgress>
                 {iconXDisabled ? (

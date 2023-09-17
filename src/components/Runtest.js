@@ -65,7 +65,6 @@ import {
   Table,
   Field,
   Tr,
-  Td,
   Inner,
   Outer,
   InnerDivCard2,
@@ -76,7 +75,8 @@ import {
   Green,
   TextScrole1,
   CardProgress,
-  IconCheckDisabled,IconXDisabled
+  IconCheckDisabled,
+  IconXDisabled,
 } from "../styled-components/StylerunTest";
 import { publicRequest } from "../requestMethod";
 import CircularProgressBar from "./CircularProgressBar";
@@ -85,7 +85,8 @@ import ProgressAll from "./ProgressAll";
 import CircularProgressBarFaild from "./CircularProgressBarFaild";
 import ProgressBarLineFaild from "./ProgressBarFaild";
 import { toast } from "react-toastify";
-
+import NavRigas from "../layout/NavRigas";
+import Menu from "../layout/Menu";
 
 function Runtest() {
   const [data, setData] = useState([]);
@@ -95,13 +96,13 @@ function Runtest() {
   });
 
   const [activeTestIndex, setActiveTestIndex] = useState(0);
-  
+
   const [tram, setTram] = useState({});
 
   const [inputValue, setInputValue] = useState();
-  const [progress, setProgress] = useState(0);
   const [type, setType] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const [showVolts, setShowVolts] = useState(false);
   const [serial, setSerial] = useState("");
   const [hideButtons, setHideButtons] = useState(false);
 
@@ -110,14 +111,13 @@ function Runtest() {
   const [iconCheckDisabled, setIconCheckDisabled] = useState(false);
   const [iconXDisabled, setIconXDisabled] = useState(false);
 
-  const [succes,setSucces] =useState("")
-  const [faild,setFaild] =useState("")
+  const [succes, setSucces] = useState("");
+  const [faild, setFaild] = useState("");
   const [showLabel, setShowLabel] = useState("");
   const [allValue, setAllValue] = useState("");
 
   const [testFailed, setTestFailed] = useState(false);
   const [errorToastShown, setErrorToastShown] = useState(false);
-
 
   const sendGlobalDataToBackend = async () => {
     try {
@@ -126,47 +126,50 @@ function Runtest() {
         const { name, description, __v, etat, ...rest } = test; // Destructure specified props and collect the rest of the properties
         return { ...rest, testId: test._id }; // Return the test object without specified props and with testId property
       });
-  
+
       // Create a new globalData object without the specified props in tests
       const updatedGlobalData = {
         ...globalData,
         tests: testsWithoutSpecifiedProps,
         serialNumber: "Not Added", // Add the serialNumber property//must remove after test important!!!!
       };
-  
+
       // Send the updated globalData to the backend
-      const res = await publicRequest.post("/add-test-result", updatedGlobalData); // Adjust the endpoint URL as needed
-      
+      const res = await publicRequest.post(
+        "/add-test-result",
+        updatedGlobalData
+      ); // Adjust the endpoint URL as needed
+
       toast.success("data send successfully");
+      setShowVolts(true);
     } catch (error) {
       console.error("Error sending global data to backend:", error);
     }
   };
-  
-  
-  
-  
+
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await publicRequest.get(`/get-test-by-name${type ? "?nameQuery=" + type : ""}`);
+        const res = await publicRequest.get(
+          `/get-test-by-name${type ? "?nameQuery=" + type : ""}`
+        );
         if (res.data && res.data.length > 0 && res.data[0].tests) {
           const testsWithResult = res.data[0].tests.map((test) => ({
             ...test,
             result: "", // Default value
-          }))/* .map(({name,description,__v,etat, ...testWithoutEtat }) => testWithoutEtat); // Remove the etat property */
-         
+          })); /* .map(({name,description,__v,etat, ...testWithoutEtat }) => testWithoutEtat); // Remove the etat property */
+
           setGlobalData({
             ...res.data[0],
             tests: testsWithResult, // Update the tests property with the new data
           });
           setData(testsWithResult);
-      
+
           setActiveTestIndex(0);
           setSucces("");
           setFaild("");
           setAllValue("");
-          setShowLabel("")
+          setShowLabel("");
         } else {
           // Handle the case where the data structure is not as expected
           setData([]);
@@ -174,7 +177,7 @@ function Runtest() {
           setSucces("");
           setFaild("");
           setAllValue("");
-          setShowLabel("")
+          setShowLabel("");
         }
       } catch (err) {
         console.log(err);
@@ -182,154 +185,129 @@ function Runtest() {
     };
     getData();
   }, [type]);
-  
-  
-  
-// Modify handleConnect
-const handleConnect = async () => {
-  try {
-    const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
-    console.log(res);
 
-    // Handle successful connection here
+  // Modify handleConnect
+  const handleConnect = async () => {
+    try {
+      const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+      if (!errorToastShown) {
+        toast.error("Connection Failed");
+        setErrorToastShown(true);
+      }
 
-    // If the connection is successful, update the flag and reset the tests
-    setTestFailed(false);
-    setFaild("");
-    setProgressActiveX(false);
-    
-    // Update the result property to "Pass" for all tests in data
-    const updatedData = data.map((test) => ({
-      ...test,
-      result: "pass",
-    }));
-    setData(updatedData);
-  } catch (error) {
-    console.log(error);
-    if (!errorToastShown) {
-      toast.error("Connection Failed");
-      setErrorToastShown(true);
+      // If the connection fails, set the flag and fail all tests
+
+      setFaild("Connection Failed");
+      setProgressActiveX(false);
+      setAllValue("Overall Failed");
+
+      // Update the result property to "Fail" for all tests in data
+      const updatedData = data.map((test) => ({
+        ...test,
+        result: "fail",
+      }));
+      setData(updatedData);
+      setTestFailed(true);
     }
-
-    // If the connection fails, set the flag and fail all tests
-    setTestFailed(true);
-    setFaild("Connection Failed");
-    setProgressActiveX(false);
-    setAllValue("Overall Failed");
-
-    // Update the result property to "Fail" for all tests in data
-    const updatedData = data.map((test) => ({
-      ...test,
-      result: "fail",
-    }));
-    setData(updatedData);
-  }
-};
+  };
 
   const [verificationText, setVerificationText] = useState(
     data.length > 0 ? data[0].description : ""
   );
 
-  
   // Modify handleFetch
-const handleFetch = async () => {
-  try {
-    const tram = await publicRequest.get("/tram/COM9");
-    console.log(tram);
-    setTestFailed(false);
-    // Handle successful fetch here
-  } catch (error) {
-    console.log(error);
-    if (!errorToastShown) {
-      toast.error("Loading Failed");
-      setErrorToastShown(true);
-    }
-    // If the connection fails, set the flag and fail all tests
-    setTestFailed(true);
-    setFaild("Connection Failed");
-    setProgressActiveX(false);
-    setAllValue("Overall Failed");
+  const handleFetch = async () => {
+    try {
+      const tram = await publicRequest.get("/tram/COM9");
+      console.log(tram);
+      setTestFailed(false);
+      // Handle successful fetch here
+    } catch (error) {
+      console.log(error);
+      if (!errorToastShown) {
+        toast.error("Loading Failed");
+        setErrorToastShown(true);
+      }
+      // If the connection fails, set the flag and fail all tests
 
-    // Update the result property to "Fail" for all tests in data
-    const updatedData = data.map((test) => ({
-      ...test,
-      result: "fail",
-    }));
-    setData(updatedData);
-    setTestFailed(true);
-  }
-};
-  
+      setFaild("Connection Failed");
+      setProgressActiveX(false);
+      setAllValue("Overall Failed");
+
+      // Update the result property to "Fail" for all tests in data
+      const updatedData = data.map((test) => ({
+        ...test,
+        result: "fail",
+      }));
+      setData(updatedData);
+      setTestFailed(true);
+    }
+  };
+
   // Now define your useEffect
   useEffect(() => {
     // Your existing useEffect code
     const test = data[activeTestIndex]; // Get the current test based on activeTestIndex
     if (test) {
       setVerificationText(test.description);
-  
+
       if (data.length > 0) {
-        if (activeTestIndex === 11) {
+        if (activeTestIndex === 10) {
           // Trigger handleConnect when activeTestIndex is 3
-          
+
           setHideButtons(true);
           setVerificationText("Connexion en cours...");
           handleConnect();
           // You may want to add a delay for handleConnect actions
           setTimeout(() => {
-             
             setHideButtons(false);
             setVerificationText(test.description);
           }, 6000);
-        } else if (activeTestIndex === 10) {
+        } else if (activeTestIndex === 11) {
           // Trigger handleFetch when activeTestIndex is 4
-          
+
           setHideButtons(true);
           setVerificationText("Fetching data...");
           handleFetch();
           // You may want to add a delay for handleFetch actions
           setTimeout(() => {
-          
             setHideButtons(false);
             setVerificationText(test.description);
           }, 6000);
         } else {
           // Handle other cases where you don't need to trigger any actions
-          
+
           setHideButtons(false);
         }
       }
     }
   }, [activeTestIndex, data, handleConnect, handleFetch]); // Include handleFetch in the dependency array
-  
-  
-
-  // Simulating progress completion
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => prevProgress + 10);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Check if progress is completed (100%) and show the popup
-  useEffect(() => {
-    if (progress === 100) {
-      setShowPopup(true);
-    }
-  }, [progress]);
-
-  const handlePopupClose = () => {
-    setShowPopup(false);
-  };
 
   const handleChange = (e) => {
     setInputValue(e.target.value);
   };
 
-  
+  const handleChangeMode = (e) => {
+    const selectedValue = e.target.value;
 
-  // In advanceToNextItemX, check the progressActiveX flag
+    // Check if the selected value is one of the specific options
+    if (
+      selectedValue === "GO" ||
+      selectedValue === "Preste" ||
+      selectedValue === "Rival"
+    ) {
+      setShowPopup(true); // Set showPopup to true when one of the options is selected
+    } else {
+      setShowPopup(false); // Set showPopup to false for other options
+    }
+
+    // You can also update other state variables or perform other actions based on the selected value
+    setType(selectedValue);
+  };
+
   const advanceToNextItem = () => {
     if (!progressActive && !iconCheckDisabled) {
       setProgressActive(true);
@@ -349,18 +327,26 @@ const handleFetch = async () => {
           const updatedData = [...data];
           updatedData[activeTestIndex].result = "pass";
           setData(updatedData);
-          
+
           setActiveTestIndex(activeTestIndex + 1);
+
+          // Check if any test result is "fail"
+          const anyTestFailed = updatedData.some(
+            (test) => test.result === "fail"
+          );
+
+          if (anyTestFailed) {
+            setAllValue("Overall Failed");
+          } else {
+            setAllValue("Overall Pass");
+          }
         }
 
         if (activeTestIndex === data.length - 1) {
-          setAllValue("Overall Pass");
-          // Update globalData with the new data
           const updatedGlobalData = { ...globalData, tests: [...data] };
           setGlobalData(updatedGlobalData);
-           // Send globalData to the backend after all updates
+          // Send globalData to the backend after all updates
           sendGlobalDataToBackend();
-         
         }
       }, 10000); // 10 seconds in milliseconds
     }
@@ -387,6 +373,17 @@ const handleFetch = async () => {
           setData(updatedData);
 
           setActiveTestIndex(activeTestIndex + 1);
+
+          // Check if any test result is "fail"
+          const anyTestFailed = updatedData.some(
+            (test) => test.result === "fail"
+          );
+
+          if (anyTestFailed) {
+            setAllValue("Overall Failed");
+          } else {
+            setAllValue("Overall Pass");
+          }
         }
 
         if (activeTestIndex === data.length - 1) {
@@ -394,19 +391,17 @@ const handleFetch = async () => {
           // Update globalData with the new data
           const updatedGlobalData = { ...globalData, tests: [...data] };
           setGlobalData(updatedGlobalData);
-           // Send globalData to the backend after all updates
+          // Send globalData to the backend after all updates
           sendGlobalDataToBackend();
         }
       }, 10000); // 10 seconds in milliseconds
     }
   };
 
-
-  
-  
-
-
   return (
+    <>
+    <NavRigas />
+    <Menu />
     <MainContainer>
       <Container1>
         <InnerContainer1>
@@ -414,10 +409,7 @@ const handleFetch = async () => {
             <MenuCard1>
               <CardItem>
                 <Text>Test sequence</Text>
-                <StyledSelect
-                  onChange={(e) => setType(e.target.value)}
-                  value={type}
-                >
+                <StyledSelect onChange={handleChangeMode} value={type}>
                   <option value="Test">Test Mode</option>
                   <option value="GO">GO</option>
                   <option value="Preste">Preste</option>
@@ -449,7 +441,7 @@ const handleFetch = async () => {
             <Card1>
               <InnerDivCard1>
                 <InnerDiv1Card1>
-                  <ButtonRun onClick={handleFetch}>
+                  <ButtonRun>
                     RUN
                     <Run />
                   </ButtonRun>
@@ -515,24 +507,22 @@ const handleFetch = async () => {
           </Card1Container1>
           <Step>
             <Table>
-              <tbody>
-                {data.map((testName, index) => (
-                  <Tr key={testName._id} active={index === activeTestIndex}>
-                    <TextField
-                      style={{
-                        color:
-                          testName.result === "fail"
-                            ? "#FF0000"
-                            : testName.result === "pass"
-                            ? "#32CD32"
-                            : "inherit",
-                      }}
-                    >
-                      Étape {index + 1}: {testName.name}
-                    </TextField>
-                  </Tr>
-                ))}
-              </tbody>
+              {data.map((testName, index) => (
+                <Tr key={testName._id} active={index === activeTestIndex}>
+                  <TextField
+                    style={{
+                      color:
+                        testName.result === "fail"
+                          ? "#FF0000"
+                          : testName.result === "pass"
+                          ? "#32CD32"
+                          : "inherit",
+                    }}
+                  >
+                    Étape {index + 1}: {testName.name}
+                  </TextField>
+                </Tr>
+              ))}
             </Table>
           </Step>
         </InnerContainer1>
@@ -588,18 +578,22 @@ const handleFetch = async () => {
               </CardItem5>
             </Menu1Card2>
             <InnerDivCard2>
-              <Outer>
-                <Inner>Volts</Inner>
-                <H3>3835 MV</H3>
-              </Outer>
-              <Outer>
-                <Inner>Volts</Inner>
-                <H3>3835 MV</H3>
-              </Outer>
-              <Outer>
-                <Inner>Volts</Inner>
-                <H3>3835 MV</H3>
-              </Outer>
+              {showVolts && (
+                <>
+                  <Outer>
+                    <Inner>Volts</Inner>
+                    <H3>3835 MV</H3>
+                  </Outer>
+                  <Outer>
+                    <Inner>Volts</Inner>
+                    <H3>3835 MV</H3>
+                  </Outer>
+                  <Outer>
+                    <Inner>Volts</Inner>
+                    <H3>3835 MV</H3>
+                  </Outer>
+                </>
+              )}
             </InnerDivCard2>
           </Card1Container2>
         </InnerContainer2>
@@ -644,6 +638,7 @@ const handleFetch = async () => {
         </DivVerifier>
       )}
     </MainContainer>
+    </>
   );
 }
 

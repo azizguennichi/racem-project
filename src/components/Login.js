@@ -21,20 +21,20 @@ import {
 } from "../styled-components/StyleLogin";
 import Logo from "../images/logo.png";
 import BKg from "../images/illustration1.PNG";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+
+import { useDispatch } from "react-redux";
 import { login } from "../redux/apiCalls";
-import axios from "axios";
+
 import { toast } from "react-toastify";
 import { publicRequest } from "../requestMethod";
 
 const Login = () => {
-  const navigate = useNavigate();
+  
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [reqEmail, setReqEmail] = useState("");
-  const user = useSelector((state) => state.user.currentUser);
+  
   const dispatch = useDispatch();
   const handleOpen = () => {
     setIsOpen(true);
@@ -53,11 +53,11 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
+ /*  useEffect(() => {
     setTimeout(() => {
       user && navigate("/adduser");
     }, 1000);
-  }, [navigate, user]);
+  }, [navigate, user]); */
 
   const handleReqPassword = async (e) => {
     e.preventDefault();

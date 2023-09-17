@@ -30,6 +30,8 @@ import Select from "react-select";
 import { publicRequest } from "../requestMethod";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Menu from "../layout/Menu";
+import NavRigas from "../layout/NavRigas";
 
 const SysConf = () => {
   const [type, setType] = useState("");
@@ -143,6 +145,9 @@ const SysConf = () => {
   };
 
   return (
+    <>
+    <NavRigas />
+    <Menu />
     <Container>
       <Card>
         <Text>Product Mode :</Text>
@@ -224,6 +229,7 @@ const SysConf = () => {
         <Button onClick={handleSave}>Sauvegarder</Button>
       </ButtonSave>
     </Container>
+     </>
   );
 };
 

@@ -601,7 +601,7 @@ export const TableWrapper = styled.div`
 
 `;
 
-export const Table = styled.table`
+export const Table = styled.div`
   border-collapse: collapse;
   width: 100%;
   
@@ -609,19 +609,12 @@ export const Table = styled.table`
  
 `;
 
-export const Tr = styled.tr`
+export const Tr = styled.div`
 background-color: ${(props) => (props.active ? '#3399FF' : 'inherit')};
 color:${(props) => (props.active ? 'white' : 'black')};
 `;
 
-export const Td = styled.td`
 
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
- 
-  width: 50%;
-`;
 
 export const TextField= styled.text`
 `;

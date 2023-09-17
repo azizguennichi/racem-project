@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-function ProgressAll({ data, activeTestIndex,testFailed }) {
+function ProgressAll({ data, activeTestIndex, testFailed }) {
   const [segments, setSegments] = useState([]);
   const [progressLabel, setProgressLabel] = useState("0%");
+  const [labelPosition, setLabelPosition] = useState(0); // Initialize labelPosition state
 
   useEffect(() => {
     // Calculate the total number of tests
@@ -16,12 +17,10 @@ function ProgressAll({ data, activeTestIndex,testFailed }) {
 
       // Check if there was a failed connection and set the progress for failed tests
       if (testFailed && test.result !== "pass") {
-        
         return {
           completed: 100 / totalTests, // All tests marked as failed
           bgColor: "#FF0000", // Set background color to red for failed tests
           color: "#FF0000", // Set text color to red for failed tests
-          
         };
       }
 
@@ -43,10 +42,13 @@ function ProgressAll({ data, activeTestIndex,testFailed }) {
     } else {
       setProgressLabel(`${Math.round(overallProgress)}%`);
     }
-  }, [data, activeTestIndex,testFailed]);
+
+    // Update labelPosition based on the progress
+    setLabelPosition(overallProgress);
+  }, [data, activeTestIndex, testFailed]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative",overflow:"hidden" }}>
       {segments.map((segment, index) => (
         <div
           key={index}
@@ -57,17 +59,20 @@ function ProgressAll({ data, activeTestIndex,testFailed }) {
             color: segment.color,
             display: "inline-block",
             position: "relative",
+            transition: "width 3s",
           }}
         ></div>
       ))}
       <div
         style={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          top: "40%",
+          left: `${labelPosition}%`, // Set left position based on labelPosition
+          transform: "translate(-110%, -50%)",
           color: "#fff",
           fontWeight: "bold",
+          fontSize:"18px",
+          transition: "left 3s",
         }}
       >
         {progressLabel}
@@ -77,3 +82,4 @@ function ProgressAll({ data, activeTestIndex,testFailed }) {
 }
 
 export default ProgressAll;
+

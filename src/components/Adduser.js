@@ -16,6 +16,7 @@ import Bkg from "../images/usefi.PNG";
 import logo from "../images/logo.png";
 import { publicRequest } from "../requestMethod";
 import { toast } from "react-toastify";
+import NavRigas from "../layout/NavRigas";
 function Adduser() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -37,6 +38,8 @@ function Adduser() {
     }
   };
   return (
+    <>
+    <NavRigas />
     <Container>
       <Card>
         <Title>Ajouter un nouvel utilisateur!</Title>
@@ -69,6 +72,7 @@ function Adduser() {
       </Card>
       <Image src={Bkg} />
     </Container>
+    </>
   );
 }
 

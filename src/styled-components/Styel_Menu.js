@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { MdSettingsSuggest } from 'react-icons/md';
 import { RiPlayList2Fill } from 'react-icons/ri';
 import { FaHome } from 'react-icons/fa';
@@ -7,6 +7,20 @@ import { FiLogOut } from 'react-icons/fi';
 import {FcDataConfiguration} from 'react-icons/fc'
 import {VscDebugStart} from 'react-icons/vsc'
 import {AiFillTool} from 'react-icons/ai'
+
+
+const disabledStyles = css`
+  pointer-events: none; /* Disable pointer events */
+  opacity: 0.6; /* Reduce opacity for a disabled look */
+
+  & svg {
+    color: grey;
+  }
+  /* Change text color to grey */
+  & p {
+    color: grey;
+  }
+`;
 
 
 export const MenuContainer = styled.nav`
@@ -27,9 +41,13 @@ export const MenuItem = styled.div`
   border-bottom:${(props) => (props.active ? '3px solid #E6EEFA' : 'none')};
   border-top:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
   border-right:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
-  border-left:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
-
-
+  border:${(props) => (props.active ? '2px solid #8DB2E3' : '')};
+   /* Apply disabled styles if the item is disabled */
+   ${(props) =>
+    props.disabled &&
+    css`
+      ${disabledStyles}
+    `}
 `;
 
 export const Container = styled.div`
@@ -37,15 +55,15 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center; 
  
-  margin-bottom:-0.4px;
+  /* margin-bottom:-0.4px; */
   z-index:222;
 
  
   
 
-  padding: 0.5px 55px;
+  padding: 0px 55px;
  
-  box-shadow: 0px 1px 0px 0px white;
+  /* box-shadow: 0px 1px 0px 0px white; */
 
 
  

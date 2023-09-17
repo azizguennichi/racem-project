@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import {
   MenuContainer,
@@ -17,9 +18,11 @@ import {
 } from '../styled-components/Styel_Menu';
 import Runtest from '../components/Runtest';
 
-function Menu({ child }) {
-  const [activeMenuItem, setActiveMenuItem] = useState(0);
-  const [userRole, setUserRole] = useState("admin"); // Set the user's role
+function Menu() {
+  const userRole = useSelector((state) => state.user.currentUser.role); // Get the user's role from Redux
+/*   const [userRole, setUserRole] = useState("expert"); // Set the user's role */
+  const [activeMenuItem, setActiveMenuItem] = useState(2);
+  const location = useLocation();
 
   // Define a mapping of menu items to user roles
   const menuItems = [
@@ -27,13 +30,13 @@ function Menu({ child }) {
       role: ["super-admin", "admin"],
       text: "System Configure",
       icon: <StyledAiTwotoneTool />,
-      to: "/sys",
+      to: "/system",
     },
     {
       role: ["super-admin", "admin", "expert"],
       text: "Test Sequence",
       icon: <StyledCgPlayListCheck />,
-      to: "#test",
+      to: "/sequence",
     },
     {
       role: ["super-admin", "admin", "expert", "operator"],
@@ -45,20 +48,25 @@ function Menu({ child }) {
       role: ["super-admin", "admin"],
       text: "Admin",
       icon: <StyledFaHome />,
-      to: "#admin2",
+      to: "/admin",
     },
     {
       role: ["super-admin", "admin", "expert"],
       text: "Reports",
       icon: <StyledFiLogOut />,
-      to: "#Users",
+      to: "/reports",
     },
     // Add other menu items here
   ];
 
-  const filteredMenuItems = menuItems.filter((item) =>
-    item.role.includes(userRole)
-  );
+  useEffect(() => {
+    const activeItem = menuItems.find((item) => item.to === location.pathname);
+    if (activeItem) {
+      setActiveMenuItem(menuItems.indexOf(activeItem));
+    } else {
+      setActiveMenuItem(null); // No matching route, set to null
+    }
+  }, [location.pathname, menuItems]);
 
   const handleMenuItemClick = (index) => {
     setActiveMenuItem(index);
@@ -66,14 +74,20 @@ function Menu({ child }) {
 
   return (
     <>
-      <MenuContainer active={activeMenuItem === 0}>
-        {filteredMenuItems.map((item, index) => (
+      <MenuContainer active={activeMenuItem === 2}>
+        {menuItems.map((item, index) => (
           <MenuItem
             key={index}
-            as={Link}
+            as={item.role.includes(userRole) ? Link : 'div'}
             to={item.to}
-            active={activeMenuItem === index}
-            onClick={() => handleMenuItemClick(index)}
+            active={activeMenuItem === index ? 'true' : undefined}
+            onClick={(event) => {
+              if (!item.role.includes(userRole)) {
+                event.preventDefault();
+              } else {
+                handleMenuItemClick(index);
+              }
+            }}
           >
             <Container>
               {item.icon}
@@ -82,13 +96,8 @@ function Menu({ child }) {
           </MenuItem>
         ))}
       </MenuContainer>
-        {child}
     </>
   );
 }
 
 export default Menu;
-
-
-
-

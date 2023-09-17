@@ -8,20 +8,20 @@ display: flex;
 const Card=styled.div`
 background-color: #ffff;
 display: flex;
-width: 100%;
-height: 100vh;
+
 flex-direction: column;
-align-items: center;
+align-items: flex-start;
 `
 export const Contaire=styled.div`
 background-color: #fff;
 display: flex;
 width: 100%;
-height: 100vh;
-flex-direction: row
+flex-direction: row;
+align-items: center;
+justify-content: center;
 ;`
 export const Image = styled.img`
-  width: auto;
+  min-width: auto;
   height: 300px;
   background-color: #ffff;
 

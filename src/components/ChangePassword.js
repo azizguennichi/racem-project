@@ -15,6 +15,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { publicRequest } from "../requestMethod";
 import { toast } from "react-toastify";
+import NavRigas from "../layout/NavRigas";
 
 const ChangePassword = () => {
   const { activation_token } = useParams();
@@ -49,6 +50,8 @@ const ChangePassword = () => {
   };
 
   return (
+    <>
+    <NavRigas />
     <Contaire>
     <Card>
       <Wrapper>
@@ -74,6 +77,8 @@ const ChangePassword = () => {
     </Card>
     <Image src={imgnewpass}/>
     </Contaire>
+    
+    </>
   );
 };
 

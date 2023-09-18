@@ -140,7 +140,7 @@ function Runtest() {
         updatedGlobalData
       ); // Adjust the endpoint URL as needed
 
-      toast.success("data send successfully");
+      
       setShowVolts(true);
     } catch (error) {
       console.error("Error sending global data to backend:", error);
@@ -211,6 +211,10 @@ function Runtest() {
       }));
       setData(updatedData);
       setTestFailed(true);
+      const updatedGlobalData = { ...globalData, tests: [...data] };
+          setGlobalData(updatedGlobalData);
+          // Send globalData to the backend after all updates
+          
     }
   };
 
@@ -244,6 +248,11 @@ function Runtest() {
       }));
       setData(updatedData);
       setTestFailed(true);
+      const updatedGlobalData = { ...globalData, tests: [...data] };
+      setGlobalData(updatedGlobalData);
+      
+    
+      
     }
   };
 
@@ -255,23 +264,26 @@ function Runtest() {
       setVerificationText(test.description);
 
       if (data.length > 0) {
-        if (activeTestIndex === 10) {
+        if (activeTestIndex === 1) {
           // Trigger handleConnect when activeTestIndex is 3
 
           setHideButtons(true);
           setVerificationText("Connexion en cours...");
           handleConnect();
+          sendGlobalDataToBackend();
           // You may want to add a delay for handleConnect actions
           setTimeout(() => {
             setHideButtons(false);
             setVerificationText(test.description);
           }, 6000);
+
         } else if (activeTestIndex === 11) {
           // Trigger handleFetch when activeTestIndex is 4
 
           setHideButtons(true);
           setVerificationText("Fetching data...");
           handleFetch();
+          sendGlobalDataToBackend();
           // You may want to add a delay for handleFetch actions
           setTimeout(() => {
             setHideButtons(false);

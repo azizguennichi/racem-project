@@ -32,12 +32,7 @@ function Menu() {
       icon: <StyledAiTwotoneTool />,
       to: "/system",
     },
-    {
-      role: ["super-admin", "admin", "expert"],
-      text: "Test Sequence",
-      icon: <StyledCgPlayListCheck />,
-      to: "/sequence",
-    },
+   
     {
       role: ["super-admin", "admin", "expert", "operator"],
       text: "Run Test Sequence",

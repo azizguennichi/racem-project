@@ -98,18 +98,26 @@ export const Role = styled.select`
   border-radius: 4px;
   font-size: 14px;
   margin-top: 10px;
-  font-style: italic;
 `;
-
+export const Back = styled.div`
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: black;
+  cursor: pointer;
+  z-index: 2;
+ margin-top: 10px;
+ margin-left: 20px;
+ margin-bottom: 10px;
+`
 export const Button = styled.button`
   margin-top: 10px;
   height: 34px;
   width: 200px;
   background-image: linear-gradient(to right, #5c84a8, #315d83);
   border-radius: 10px;
-  font-style: italic;
   border: transparent;
-  font-family: 'Poppins';
+
   color: #ffffff;
   padding-left: 2px;
   align-items: center;

@@ -6,9 +6,9 @@ display: flex;
   background-color : #ffffff;
 `;
 const ForgotPassword = styled.span`
-  font-size: 10px;
+  font-size: 13px;
   color: #555555;
-  margin-top: 10px;
+  margin-top: 20px;
   cursor: pointer;
 `;
 const Card=styled.div`
@@ -26,7 +26,7 @@ const Image = styled.img`
 `;
 const Wrapper = styled.div`
   display: flex;
-  width: 600px;
+  width: 700px;
   padding: 20px;
   padding-top: 10%;
   flex-direction: column;
@@ -38,42 +38,60 @@ const Title = styled.h1`
   font-size: 24px;
   margin-bottom: 20px;
   text-align: center;
-  font-family: 'Caprasimo', cursive;
+  
 `;
-const Label=styled.label`
-top: 42.19%;
-bottom: 54.88%;
-text-transform: capitalize;
-font-family: 'Poppins';
-font-style: italic;
-font-weight: 300;
-font-size: 20px;
-line-height: 30px;
-/* identical to box height */
-color: #161625;
-@media only screen and (max-width: 900px) and (min-width: 750px) {
-    
+const Label = styled.label`
+  position: relative; /* Added to position the pseudo-element */
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  
+  /* Pseudo-element to create an underline effect */
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #007bff; /* Underline color */
+    transform-origin: center;
+    transform: scaleX(0); /* Initially hidden */
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* Hover effect to reveal the underline */
+  &:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Media queries for responsiveness */
+  @media only screen and (max-width: 900px) and (min-width: 750px) {
     height: auto;
-    width:205px
-}
-@media only screen and (max-width: 750px)and(min-width: 550px) {
+    width: 205px;
+  }
+
+  @media only screen and (max-width: 750px) and (min-width: 550px) {
     width: 180.05px;
     height: auto;
-}
-@media only screen and (max-width: 550px) {
-   width: 85.05px;
-  height: auto;
-  align-items: center;
-  text-align:center;
-  text-size-adjust: calc();
- } 
-`
+  }
+
+  @media only screen and (max-width: 550px) {
+    width: 85.05px;
+    height: auto;
+    align-items: center;
+    text-align: center;
+    text-size-adjust: calc();
+  }
+`;
 
 const Input = styled.input`
    background-color: ${({ dark }) => (dark ? '#161625' : '#efeff4')};
   border: none;
   width: 300px; /* Set the width to 200px */
-  font-family: 'Inter';
+  
   outline: none;
   border-radius: 8px;
   color: ${({ dark }) => (dark ? '#e4e4e4' : '#161625')};
@@ -127,10 +145,10 @@ const Button = styled.button`
   background-image: linear-gradient(to right,#5C84A8, #315D83);
   border-radius: 10px; 
   border: transparent;
-  font-family: 'Poppins';
+  
   color: #ffffff;
-  font-style: italic;
-  padding-left:2px;
+
+  padding-left:4px;
   align-items: center;
   text-align: center;
   cursor: pointer;

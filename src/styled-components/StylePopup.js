@@ -30,7 +30,7 @@ export const PopupButton = styled.button`
    width: 150px;
   background-image: linear-gradient(to right,#5C84A8, #315D83);
   border: transparent;
-  font-family: 'Poppins';
+  
   color: #ffffff;
 `;
 
@@ -40,6 +40,7 @@ top: 10px;
   right: 10px;
   width: 30px;
   height: 30px;
+  cursor: pointer;
   color: ${props => (props.isOpen ? 'green' : 'red')};
   // Additional styling for the close icon
 `;

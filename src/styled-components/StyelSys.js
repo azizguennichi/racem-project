@@ -37,9 +37,9 @@ export const Mode = styled.select`
 `;
 
 export const Input = styled.input`
-  padding: 4px;
+  padding: 4px ;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 `;
 

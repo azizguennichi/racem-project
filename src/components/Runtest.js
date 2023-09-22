@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Testes from "../datat.json";
+
 import {
   MainContainer,
   InnerContainer1,
@@ -90,20 +90,30 @@ import Menu from "../layout/Menu";
 
 function Runtest() {
   const [data, setData] = useState([]);
+  const [sysData, setSysData] = useState([]);
   const [globalData, setGlobalData] = useState({
     // Initialize globalData with res.data[0]
     tests: [], // Initialize the tests property as an empty array
   });
 
+
+
   const [activeTestIndex, setActiveTestIndex] = useState(0);
 
   const [tram, setTram] = useState({});
 
+
   const [inputValue, setInputValue] = useState();
   const [type, setType] = useState("");
+
   const [showPopup, setShowPopup] = useState(false);
   const [showVolts, setShowVolts] = useState(false);
-  const [serial, setSerial] = useState("");
+
+  const [serial, setSerial] = useState(tram && tram.serialnumber);
+  const [model, setModel] = useState(tram && tram.productmodel);
+  const [mac, setMac] = useState("");
+
+
   const [hideButtons, setHideButtons] = useState(false);
 
   const [progressActive, setProgressActive] = useState(false);
@@ -117,35 +127,69 @@ function Runtest() {
   const [allValue, setAllValue] = useState("");
 
   const [testFailed, setTestFailed] = useState(false);
-  const [errorToastShown, setErrorToastShown] = useState(false);
 
-  const sendGlobalDataToBackend = async () => {
+
+  const sendGlobalDataToBackend = async (updatedData = null) => {
     try {
       // Remove the specified properties from each test object in globalData.tests
       const testsWithoutSpecifiedProps = globalData.tests.map((test) => {
-        const { name, description, __v, etat, ...rest } = test; // Destructure specified props and collect the rest of the properties
-        return { ...rest, testId: test._id }; // Return the test object without specified props and with testId property
+        const { name, description, __v, etat, ...rest } = test;
+        return { ...rest, testId: test._id };
       });
-
-      // Create a new globalData object without the specified props in tests
+  
       const updatedGlobalData = {
         ...globalData,
         tests: testsWithoutSpecifiedProps,
-        serialNumber: "Not Added", // Add the serialNumber property//must remove after test important!!!!
+        serialNumber: "Not Added", // Add the serialNumber property // must remove after test important!!!!
       };
-
+  
+      // If updatedData is provided, update the tests property in updatedGlobalData
+  
+  
+      console.log("updatedGlobalDataFinal:", updatedGlobalData);
+  
       // Send the updated globalData to the backend
-      const res = await publicRequest.post(
-        "/add-test-result",
-        updatedGlobalData
-      ); // Adjust the endpoint URL as needed
-
-      
+      const res = await publicRequest.post("/add-test-result", updatedGlobalData);
+  
+      toast.success("data sent successfully");
       setShowVolts(true);
     } catch (error) {
       console.error("Error sending global data to backend:", error);
     }
   };
+
+  const sendGlobalDataToBackendFaild = async (updatedData = null) => {
+    try {
+      // Remove the specified properties from each test object in globalData.tests
+      const testsWithoutSpecifiedProps = globalData.tests.map((test) => {
+        const { name, description, __v, etat, ...rest } = test;
+        return { ...rest, testId: test._id };
+      });
+  
+      const updatedGlobalData = {
+        ...globalData,
+        tests: testsWithoutSpecifiedProps,
+        serialNumber: serial ? serial : "Not Added", // Add the serialNumber property // must remove after test important!!!!
+      };
+  
+      // If updatedData is provided, update the tests property in updatedGlobalData
+      if (updatedData !== null) {
+        updatedGlobalData.tests = updatedData;
+      }
+  
+      console.log("updatedGlobalDataFinal:", updatedGlobalData);
+  
+      // Send the updated globalData to the backend
+      const res = await publicRequest.post("/add-test-result", updatedGlobalData);
+  
+      toast.success("data sent successfully");
+      setShowVolts(true);
+    } catch (error) {
+      console.error("Error sending global data to backend:", error);
+    }
+  };
+  
+  
 
   useEffect(() => {
     const getData = async () => {
@@ -163,8 +207,9 @@ function Runtest() {
             ...res.data[0],
             tests: testsWithResult, // Update the tests property with the new data
           });
+          setSysData(res.data[0])
+          
           setData(testsWithResult);
-
           setActiveTestIndex(0);
           setSucces("");
           setFaild("");
@@ -185,74 +230,41 @@ function Runtest() {
     };
     getData();
   }, [type]);
-
+  console.log(sysData)
   // Modify handleConnect
-  const handleConnect = async () => {
-    try {
-      const res = await publicRequest.post("/connect/01:23:45:67:99:E3");
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-      if (!errorToastShown) {
-        toast.error("Connection Failed");
-        setErrorToastShown(true);
-      }
-
-      // If the connection fails, set the flag and fail all tests
-
-      setFaild("Connection Failed");
-      setProgressActiveX(false);
-      setAllValue("Overall Failed");
-
-      // Update the result property to "Fail" for all tests in data
-      const updatedData = data.map((test) => ({
-        ...test,
-        result: "fail",
-      }));
-      setData(updatedData);
-      setTestFailed(true);
-      const updatedGlobalData = { ...globalData, tests: [...data] };
-          setGlobalData(updatedGlobalData);
-          // Send globalData to the backend after all updates
-          
-    }
-  };
-
+ 
   const [verificationText, setVerificationText] = useState(
     data.length > 0 ? data[0].description : ""
   );
 
+   // Modify handleConnect
+ // Modify handleConnect
+ const handleConnect = async () => {
+  try {
+    const res = await publicRequest.post("/connect");
+    console.log(res);
+    toast.success("Connection Success")
+    setMac(res.data.address)
+    
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Connection Failed");
+  }
+};
+
+
   // Modify handleFetch
   const handleFetch = async () => {
     try {
-      const tram = await publicRequest.get("/tram/COM9");
-      console.log(tram);
-      setTestFailed(false);
-      // Handle successful fetch here
+      const data = await publicRequest.get("/tram/COM9");
+      console.log(data);
+      setTram(data.data);
+      toast.success("Tram Success")
     } catch (error) {
       console.log(error);
-      if (!errorToastShown) {
-        toast.error("Loading Failed");
-        setErrorToastShown(true);
-      }
-      // If the connection fails, set the flag and fail all tests
+      toast.error("Fetched Failed");
 
-      setFaild("Connection Failed");
-      setProgressActiveX(false);
-      setAllValue("Overall Failed");
-
-      // Update the result property to "Fail" for all tests in data
-      const updatedData = data.map((test) => ({
-        ...test,
-        result: "fail",
-      }));
-      setData(updatedData);
-      setTestFailed(true);
-      const updatedGlobalData = { ...globalData, tests: [...data] };
-      setGlobalData(updatedGlobalData);
-      
-    
-      
     }
   };
 
@@ -264,13 +276,13 @@ function Runtest() {
       setVerificationText(test.description);
 
       if (data.length > 0) {
-        if (activeTestIndex === 1) {
+        if (activeTestIndex === 10) {
           // Trigger handleConnect when activeTestIndex is 3
 
           setHideButtons(true);
           setVerificationText("Connexion en cours...");
           handleConnect();
-          sendGlobalDataToBackend();
+          
           // You may want to add a delay for handleConnect actions
           setTimeout(() => {
             setHideButtons(false);
@@ -283,7 +295,7 @@ function Runtest() {
           setHideButtons(true);
           setVerificationText("Fetching data...");
           handleFetch();
-          sendGlobalDataToBackend();
+          
           // You may want to add a delay for handleFetch actions
           setTimeout(() => {
             setHideButtons(false);
@@ -296,7 +308,8 @@ function Runtest() {
         }
       }
     }
-  }, [activeTestIndex, data, handleConnect, handleFetch]); // Include handleFetch in the dependency array
+  }, [activeTestIndex, data]); // Include handleFetch in the dependency array
+ 
 
   const handleChange = (e) => {
     setInputValue(e.target.value);
@@ -309,10 +322,9 @@ function Runtest() {
     if (
       selectedValue === "GO" ||
       selectedValue === "Preste" ||
-      selectedValue === "Rival"
-    ) {
-      setShowPopup(true); // Set showPopup to true when one of the options is selected
-    } else {
+      selectedValue === "Rival" || 
+      selectedValue === "" 
+    ) { 
       setShowPopup(false); // Set showPopup to false for other options
     }
 
@@ -320,6 +332,7 @@ function Runtest() {
     setType(selectedValue);
   };
 
+  
   const advanceToNextItem = () => {
     if (!progressActive && !iconCheckDisabled) {
       setProgressActive(true);
@@ -357,299 +370,326 @@ function Runtest() {
         if (activeTestIndex === data.length - 1) {
           const updatedGlobalData = { ...globalData, tests: [...data] };
           setGlobalData(updatedGlobalData);
+          console.log("updatedGlobalData :", updatedGlobalData);
           // Send globalData to the backend after all updates
           sendGlobalDataToBackend();
         }
-      }, 10000); // 10 seconds in milliseconds
+      }, sysData.timeTest * 1000); // 10 seconds in milliseconds
     }
   };
 
+  
   const advanceToNextItemX = () => {
     if (!progressActiveX && !iconXDisabled) {
       setProgressActiveX(true);
       setIconXDisabled(true);
       setFaild("");
-      setSucces(""); // Clear the success text
-
-      // Simulate a 10-second progress
-      setTimeout(() => {
-        setFaild("Step Resultat Failed");
-        setShowLabel("Failed"); // Show the faild label
-        setProgressActiveX(false);
-        setIconXDisabled(false);
-
-        if (activeTestIndex < data.length) {
-          // Update the result property to "Fail" for the current test
-          const updatedData = [...data];
-          updatedData[activeTestIndex].result = "fail";
-          setData(updatedData);
-
-          setActiveTestIndex(activeTestIndex + 1);
-
-          // Check if any test result is "fail"
-          const anyTestFailed = updatedData.some(
-            (test) => test.result === "fail"
-          );
-
-          if (anyTestFailed) {
-            setAllValue("Overall Failed");
-          } else {
-            setAllValue("Overall Pass");
-          }
-        }
-
-        if (activeTestIndex === data.length - 1) {
+      setSucces("");
+  
+      if (activeTestIndex >= 0 && activeTestIndex <= 4) {
+        setTimeout(() => {
+          setFaild("Step Resultat Failed");
+          setShowLabel("Failed");
           setAllValue("Overall Failed");
-          // Update globalData with the new data
-          const updatedGlobalData = { ...globalData, tests: [...data] };
-          setGlobalData(updatedGlobalData);
-          // Send globalData to the backend after all updates
-          sendGlobalDataToBackend();
-        }
-      }, 10000); // 10 seconds in milliseconds
+          setProgressActiveX(false);
+          setIconXDisabled(false);
+  
+          const updatedData = data.map((test) => ({
+          ...test,
+          result: "fail",
+          testId: test._id, // Add the testId property
+        }));
+      
+        // Update the data state with the updatedData array
+        setTestFailed(true)
+        setData(updatedData);
+        
+      
+        // Send updatedData to the backend
+        sendGlobalDataToBackendFaild(updatedData);
+  
+        }, 10000);
+       
+        
+      } else {
+        // Continue with your existing logic for other test steps
+        setTimeout(() => {
+          setFaild("Step Resultat Failed");
+          setShowLabel("Failed");
+          setProgressActiveX(false);
+          setIconXDisabled(false);
+  
+          if (activeTestIndex < data.length) {
+            // Update the result property to "Fail" for the current test
+            const updatedData = [...data];
+            updatedData[activeTestIndex].result = "fail";
+            setData(updatedData);
+  
+            setActiveTestIndex(activeTestIndex + 1);
+  
+            const anyTestFailed = updatedData.some((test) => test.result === "fail");
+  
+            if (anyTestFailed) {
+              setAllValue("Overall Failed");
+            } else {
+              setAllValue("Overall Pass");
+            }
+          }
+  
+          if (activeTestIndex === data.length - 1) {
+            setAllValue("Overall Failed");
+            const updatedGlobalData = { ...globalData, tests: [...data] };
+            setGlobalData(updatedGlobalData);
+            sendGlobalDataToBackend(updatedGlobalData);
+          }
+        }, sysData.timeTest * 1000);
+      }
     }
   };
-
+  
+  
+  
   return (
     <>
-    <NavRigas />
-    <Menu />
-    <MainContainer>
-      <Container1>
-        <InnerContainer1>
-          <Card1Container1>
-            <MenuCard1>
-              <CardItem>
-                <Text>Test sequence</Text>
-                <StyledSelect onChange={handleChangeMode} value={type}>
-                  <option value="Test">Test Mode</option>
-                  <option value="GO">GO</option>
-                  <option value="Preste">Preste</option>
-                  <option value="Rival">Rival</option>
-                </StyledSelect>
-              </CardItem>
-              <CardItem>
-                <Text>Model #</Text>
-                <LabelModel
-                  value={inputValue}
-                  onChange={handleChange}
-                  disabled
-                />
-              </CardItem>
-              <CardItem>
-                <Text>Serial #</Text>
-                <LabelSerial
-                  value={inputValue}
-                  onChange={handleChange}
-                  disabled
-                />
-              </CardItem>
+      <NavRigas />
+      <Menu />
+      <MainContainer>
+        <Container1>
+          <InnerContainer1>
+            <Card1Container1>
+              <MenuCard1>
+                <CardItem>
+                  <Text>séquence de test</Text>
+                  <StyledSelect onChange={handleChangeMode} value={type}>
+                    <option value="">Select Model</option>
+                    <option value="GO">GO</option>
+                    <option value="Preste">Preste</option>
+                    <option value="Rival">Rival</option>
+                  </StyledSelect>
+                </CardItem>
+                <CardItem>
+                  <Text>Model #</Text>
+                  <LabelModel value={model} disabled />
+                </CardItem>
+                <CardItem>
+                  <Text>Serial #</Text>
+                  <LabelSerial value={serial} disabled />
+                </CardItem>
 
-              <CardItem>
-                <Text>Mac #</Text>
-                <LabelMac value={inputValue} onChange={handleChange} disabled />
-              </CardItem>
-            </MenuCard1>
-            <Card1>
-              <InnerDivCard1>
-                <InnerDiv1Card1>
-                  <ButtonRun>
-                    RUN
-                    <Run />
-                  </ButtonRun>
-                  <LabelEta
-                    value={allValue}
-                    disabled
-                    style={{
-                      color:
-                        allValue === "Overall Pass"
-                          ? "green"
-                          : allValue === "Overall Failed"
-                          ? "red"
-                          : "black",
-                      border:
-                        allValue === "Overall Pass"
-                          ? "4px solid #32CD32"
-                          : allValue === "Overall Failed"
-                          ? "4px solid #FF0000"
-                          : "4px solid grey",
-                    }}
-                  />
-                </InnerDiv1Card1>
-                <InnerDiv2Card1>
-                  <DivTextProg>
-                    <TextScrole>Overall Progress</TextScrole>
-                    <ProgressBarContainer1>
-                      <ProgressAll
-                        data={data}
-                        activeTestIndex={activeTestIndex}
-                        testFailed={testFailed}
-                      />
-                    </ProgressBarContainer1>
-                  </DivTextProg>
-                  <InnerButton>
-                    <Button>save as CSV</Button>
-                    <Button>Save as PDF</Button>
-                    <Button>Print</Button>
-                  </InnerButton>
-                </InnerDiv2Card1>
-              </InnerDivCard1>
-              <InnerDiv3Card1>
-                <Text>Qte Totale testee</Text>
-                <LabelTotal
-                  type="text"
-                  value={inputValue}
-                  onChange={handleChange}
-                />
-
-                <Text>Qte Totale OK</Text>
-                <LabelTotalOk
-                  type="text"
-                  value={inputValue}
-                  onChange={handleChange}
-                />
-                <Text>Qte Totale NOK</Text>
-                <LabelTotalNot
-                  type="text"
-                  value={inputValue}
-                  onChange={handleChange}
-                />
-              </InnerDiv3Card1>
-            </Card1>
-          </Card1Container1>
-          <Step>
-            <Table>
-              {data.map((testName, index) => (
-                <Tr key={testName._id} active={index === activeTestIndex}>
-                  <TextField
-                    style={{
-                      color:
-                        testName.result === "fail"
-                          ? "#FF0000"
-                          : testName.result === "pass"
-                          ? "#32CD32"
-                          : "inherit",
-                    }}
-                  >
-                    Étape {index + 1}: {testName.name}
-                  </TextField>
-                </Tr>
-              ))}
-            </Table>
-          </Step>
-        </InnerContainer1>
-        <InnerContainer2>
-          <Card1Container2>
-            <Menu1Card2>
-              <CardItem2>
-                <Text>
-                  {data[activeTestIndex] && (
-                    <Green
+                <CardItem>
+                  <Text>Mac #</Text>
+                  <LabelMac value={mac} disabled />
+                </CardItem>
+              </MenuCard1>
+              <Card1>
+                <InnerDivCard1>
+                  <InnerDiv1Card1>
+                    <ButtonRun onClick={() => setShowPopup(true)}>
+                      RUN
+                      <Run />
+                    </ButtonRun>
+                    <LabelEta
+                      value={allValue}
+                      disabled
                       style={{
                         color:
-                          data[activeTestIndex].result === "fail"
-                            ? "#FF0000"
-                            : data[activeTestIndex].result === "pass"
-                            ? "#32CD32"
-                            : "inherit",
+                          allValue === "Overall Pass"
+                            ? "green"
+                            : allValue === "Overall Failed"
+                            ? "red"
+                            : "black",
+                        border:
+                          allValue === "Overall Pass"
+                            ? "4px solid #32CD32"
+                            : allValue === "Overall Failed"
+                            ? "4px solid #FF0000"
+                            : "4px solid grey",
                       }}
-                    >
-                      Étape {activeTestIndex + 1}: {data[activeTestIndex].name}
-                    </Green>
+                    />
+                  </InnerDiv1Card1>
+                  <InnerDiv2Card1>
+                    <DivTextProg>
+                      <TextScrole>Overall Progress</TextScrole>
+                      <ProgressBarContainer1>
+                        <ProgressAll
+                          data={data}
+                          activeTestIndex={activeTestIndex}
+                          testFailed={testFailed}
+                        />
+                      </ProgressBarContainer1>
+                    </DivTextProg>
+                    <InnerButton>
+                      <Button>save as CSV</Button>
+                      <Button>Save as PDF</Button>
+                      <Button>Print</Button>
+                    </InnerButton>
+                  </InnerDiv2Card1>
+                </InnerDivCard1>
+                <InnerDiv3Card1>
+                  <Text>Qte Totale testee</Text>
+                  <LabelTotal
+                    type="text"
+                    value={inputValue}
+                    onChange={handleChange}
+                  />
+
+                  <Text>Qte Totale OK</Text>
+                  <LabelTotalOk
+                    type="text"
+                    value={inputValue}
+                    onChange={handleChange}
+                  />
+                  <Text>Qte Totale NOK</Text>
+                  <LabelTotalNot
+                    type="text"
+                    value={inputValue}
+                    onChange={handleChange}
+                  />
+                </InnerDiv3Card1>
+              </Card1>
+            </Card1Container1>
+            <Step>
+  <Table>
+    {data.map((test, index) => (
+      <Tr key={test._id} active={index === activeTestIndex}>
+        <TextField
+          style={{
+            color:
+              test.result === "fail"
+                ? "#FF0000"
+                : test.result === "pass"
+                ? "#32CD32"
+                : "inherit",
+          }}
+        >
+          Étape {index + 1}: {test.description}
+          <ul>
+            {test.souTests.map((souTest, souTestIndex) => (
+              <li key={`${souTest._id}_${souTestIndex}`}> {/* Provide a unique key */}
+                {souTest.description}
+              </li>
+            ))}
+          </ul>
+        </TextField>
+      </Tr>
+    ))}
+  </Table>
+</Step>
+
+          </InnerContainer1>
+          <InnerContainer2>
+            <Card1Container2>
+              <Menu1Card2>
+                <CardItem2>
+                  <Text>
+                    {data[activeTestIndex] && (
+                      <Green
+                        style={{
+                          color:
+                            data[activeTestIndex].result === "fail"
+                              ? "#FF0000"
+                              : data[activeTestIndex].result === "pass"
+                              ? "#32CD32"
+                              : "inherit",
+                        }}
+                      >
+                        Étape {activeTestIndex + 1}:{" "}
+                        {data[activeTestIndex].name}
+                      </Green>
+                    )}
+                  </Text>
+                </CardItem2>
+                <CardItem3>
+                  <TextScrole1>Step Progress</TextScrole1>
+                  <ProgressBarContainer1>
+                    {progressActive ? (
+                      <ProgressBarLine />
+                    ) : progressActiveX ? (
+                      <ProgressBarLineFaild />
+                    ) : null}
+                  </ProgressBarContainer1>
+                </CardItem3>
+
+                <CardItem5>
+                  <LabelEta2
+                    value={showLabel === "Failed" ? faild : succes}
+                    disabled
+                    style={{
+                      border: showLabel
+                        ? showLabel === "Failed"
+                          ? "4px solid  #FF0000"
+                          : "4px solid #32CD32"
+                        : "4px solid grey",
+                      color: showLabel
+                        ? showLabel === "Failed"
+                          ? "#FF0000"
+                          : "#32CD32"
+                        : "black",
+                    }}
+                  />
+                </CardItem5>
+              </Menu1Card2>
+              <InnerDivCard2>
+                {showVolts && (
+                  <>
+                    <Outer>
+                      <Inner>Volts</Inner>
+                      <H3>3835 MV</H3>
+                    </Outer>
+                    <Outer>
+                      <Inner>Volts</Inner>
+                      <H3>3835 MV</H3>
+                    </Outer>
+                    <Outer>
+                      <Inner>Volts</Inner>
+                      <H3>3835 MV</H3>
+                    </Outer>
+                  </>
+                )}
+              </InnerDivCard2>
+            </Card1Container2>
+          </InnerContainer2>
+        </Container1>
+        {showPopup && (
+          <DivVerifier>
+            <TextInsideBorder>Operator Instructions</TextInsideBorder>
+            <TextVerif>{verificationText}</TextVerif>
+            {!hideButtons && (
+              <CardButton>
+                <CardProgress>
+                  {iconXDisabled ? (
+                    <IconXDisabled
+                      onClick={advanceToNextItemX}
+                      disabled={iconXDisabled}
+                    />
+                  ) : (
+                    <IconX
+                      onClick={advanceToNextItemX}
+                      disabled={iconXDisabled}
+                    />
                   )}
-                </Text>
-              </CardItem2>
-              <CardItem3>
-                <TextScrole1>Step Progress</TextScrole1>
-                <ProgressBarContainer1>
-                  {progressActive ? (
-                    <ProgressBarLine />
-                  ) : progressActiveX ? (
-                    <ProgressBarLineFaild />
-                  ) : null}
-                </ProgressBarContainer1>
-              </CardItem3>
+                  {progressActiveX && <CircularProgressBarFaild />}
+                </CardProgress>
 
-              <CardItem5>
-                <LabelEta2
-                  value={showLabel === "Failed" ? faild : succes}
-                  disabled
-                  style={{
-                    border: showLabel
-                      ? showLabel === "Failed"
-                        ? "4px solid  #FF0000"
-                        : "4px solid #32CD32"
-                      : "4px solid grey",
-                    color: showLabel
-                      ? showLabel === "Failed"
-                        ? "#FF0000"
-                        : "#32CD32"
-                      : "black",
-                  }}
-                />
-              </CardItem5>
-            </Menu1Card2>
-            <InnerDivCard2>
-              {showVolts && (
-                <>
-                  <Outer>
-                    <Inner>Volts</Inner>
-                    <H3>3835 MV</H3>
-                  </Outer>
-                  <Outer>
-                    <Inner>Volts</Inner>
-                    <H3>3835 MV</H3>
-                  </Outer>
-                  <Outer>
-                    <Inner>Volts</Inner>
-                    <H3>3835 MV</H3>
-                  </Outer>
-                </>
-              )}
-            </InnerDivCard2>
-          </Card1Container2>
-        </InnerContainer2>
-      </Container1>
-      {showPopup && (
-        <DivVerifier>
-          <TextInsideBorder>Operator Instructions</TextInsideBorder>
-          <TextVerif>{verificationText}</TextVerif>
-          {!hideButtons && (
-            <CardButton>
-              <CardProgress>
-                {iconXDisabled ? (
-                  <IconXDisabled
-                    onClick={advanceToNextItemX}
-                    disabled={iconXDisabled}
-                  />
-                ) : (
-                  <IconX
-                    onClick={advanceToNextItemX}
-                    disabled={iconXDisabled}
-                  />
-                )}
-                {progressActiveX && <CircularProgressBarFaild />}
-              </CardProgress>
-
-              <CardProgress>
-                {iconCheckDisabled ? (
-                  <IconCheckDisabled
-                    onClick={advanceToNextItem}
-                    disabled={iconCheckDisabled}
-                  />
-                ) : (
-                  <IconCheck
-                    onClick={advanceToNextItem}
-                    disabled={iconCheckDisabled}
-                  />
-                )}
-                {progressActive && <CircularProgressBar />}
-              </CardProgress>
-            </CardButton>
-          )}
-        </DivVerifier>
-      )}
-    </MainContainer>
+                <CardProgress>
+                  {iconCheckDisabled ? (
+                    <IconCheckDisabled
+                      onClick={advanceToNextItem}
+                      disabled={iconCheckDisabled}
+                    />
+                  ) : (
+                    <IconCheck
+                      onClick={advanceToNextItem}
+                      disabled={iconCheckDisabled}
+                    />
+                  )}
+                  {progressActive && <CircularProgressBar time={sysData.timeTest} />}
+                </CardProgress>
+              </CardButton>
+            )}
+          </DivVerifier>
+        )}
+      </MainContainer>
     </>
   );
 }

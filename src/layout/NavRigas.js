@@ -54,7 +54,7 @@ function NavRigas() {
             <ContainerUser>
               <ContainerText>
             <TextLog>Logged in as</TextLog>
-              <TextUser>{currentUser?.firstName}</TextUser>
+              <TextUser>{currentUser?.firstName}{" "}{currentUser?.lastName}</TextUser>
               </ContainerText>
               <TextRol>({currentUser?.role})</TextRol>
             </ContainerUser>

@@ -37,14 +37,16 @@ function ProgressAll({ data, activeTestIndex, testFailed }) {
     const overallProgress = (activeTestIndex / totalTests) * 100;
 
     // Set the progress label one time
-    if (testFailed) {
-      setProgressLabel("100%");
-    } else {
-      setProgressLabel(`${Math.round(overallProgress)}%`);
-    }
+    setProgressLabel(testFailed ? "100%" : `${Math.round(overallProgress)}%`);
 
-    // Update labelPosition based on the progress
-    setLabelPosition(overallProgress);
+    // After the useEffect hook
+    if (testFailed) {
+      // If all tests have failed, set the label position to the right end
+      setLabelPosition(100);
+    } else {
+      // Update labelPosition based on the progress
+      setLabelPosition(overallProgress);
+    }
   }, [data, activeTestIndex, testFailed]);
 
   return (

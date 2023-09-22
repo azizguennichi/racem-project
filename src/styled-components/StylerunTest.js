@@ -63,7 +63,7 @@ export const StyledSelect = styled.select`
   border: 2px solid #ccc;
   background-color:#ccc ;
   border-radius: 4px;
-  width: 90px;
+  width: 110px;
   min-height: 1.5em;
   outline: none;
   font-family: 'Signika Negative', sans-serif;
@@ -73,12 +73,10 @@ export const StyledSelect = styled.select`
 `;
 export const Text =styled.p`
 font-size: 14px;
-font-family: 'Poppins', sans-serif; 
 color: #ffff;
 `
 export const Green =styled.span`
-font-size: 17px;
-font-family: 'Poppins', sans-serif; 
+
 color: #9CE61D;
 `
 
@@ -218,9 +216,12 @@ export const InnerDiv3Card1 = styled.div`
 `;
 
 export const Step=styled.div`
-width: 20%;
+width: 35%;
 height: 190px;
 border: 3px solid #D0D3F9;
+  overflow-y: auto;
+  
+  
 `
 
 
@@ -361,7 +362,7 @@ export const ProgressBarContainer1 = styled.div`
   width: 100%; /* Set the desired width for the progress bar container */
   background-color: #f2f2f2;
   border-radius: 4px;
-  margin-right: 40px;
+  margin-right: 10px;
  
 
 `;
@@ -743,6 +744,7 @@ display: flex;
 flex-direction: row;
 align-items: center;
 gap: 15px;
+position: relative;
  
 `
 

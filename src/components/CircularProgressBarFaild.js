@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-function CircularProgressBarFaild() {
-const duration_bar = 10; // Set the constant duration in seconds
+function CircularProgressBarFaild({time}) {
+const duration_bar = time; // Set the constant duration in seconds
   const intervalDuration = 1000; // Set the interval to 1000ms (1 second)
   const [progress, setProgress] = useState(0);
 
@@ -26,7 +26,7 @@ const duration_bar = 10; // Set the constant duration in seconds
     };
   }, []); // The empty dependency array ensures this effect runs once on component mount
   return (
-    <div style={{ width: 75, height: 75,position: 'absolute', right: '300px'  }}>
+    <div style={{ width: 73, height: 73,position: 'absolute', right: '300px'  }}>
       <CircularProgressbar
         value={progress}
         text={`${Math.round(progress)}%`}

@@ -11,7 +11,7 @@ import {AiFillTool} from 'react-icons/ai'
 
 const disabledStyles = css`
   pointer-events: none; /* Disable pointer events */
-  opacity: 0.6; /* Reduce opacity for a disabled look */
+  
 
   & svg {
     color: grey;

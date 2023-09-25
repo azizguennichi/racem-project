@@ -96,12 +96,10 @@ function Runtest() {
     tests: [], // Initialize the tests property as an empty array
   });
 
-
-
   const [activeTestIndex, setActiveTestIndex] = useState(0);
+  const [activeSousIndex, setActiveSousIndex] = useState(0);
 
   const [tram, setTram] = useState({});
-
 
   const [inputValue, setInputValue] = useState();
   const [type, setType] = useState("");
@@ -112,7 +110,6 @@ function Runtest() {
   const [serial, setSerial] = useState(tram && tram.serialnumber);
   const [model, setModel] = useState(tram && tram.productmodel);
   const [mac, setMac] = useState("");
-
 
   const [hideButtons, setHideButtons] = useState(false);
 
@@ -127,7 +124,14 @@ function Runtest() {
   const [allValue, setAllValue] = useState("");
 
   const [testFailed, setTestFailed] = useState(false);
+  const [sousFailed, setSousFailed] = useState(false);
 
+  const [verificationText, setVerificationText] = useState(
+    data.length > 0 ? data[0].description : ""
+  );
+  const [subTestVerificationText, setSubTestVerificationText] = useState(
+  data.length > 0 && data[0].souTests.length > 0 ? data[0].souTests[0].description : ""
+);
 
   const sendGlobalDataToBackend = async (updatedData = null) => {
     try {
@@ -136,21 +140,23 @@ function Runtest() {
         const { name, description, __v, etat, ...rest } = test;
         return { ...rest, testId: test._id };
       });
-  
+
       const updatedGlobalData = {
         ...globalData,
         tests: testsWithoutSpecifiedProps,
         serialNumber: "Not Added", // Add the serialNumber property // must remove after test important!!!!
       };
-  
+
       // If updatedData is provided, update the tests property in updatedGlobalData
-  
-  
+
       console.log("updatedGlobalDataFinal:", updatedGlobalData);
-  
+
       // Send the updated globalData to the backend
-      const res = await publicRequest.post("/add-test-result", updatedGlobalData);
-  
+      const res = await publicRequest.post(
+        "/add-test-result",
+        updatedGlobalData
+      );
+
       toast.success("data sent successfully");
       setShowVolts(true);
     } catch (error) {
@@ -165,31 +171,32 @@ function Runtest() {
         const { name, description, __v, etat, ...rest } = test;
         return { ...rest, testId: test._id };
       });
-  
+
       const updatedGlobalData = {
         ...globalData,
         tests: testsWithoutSpecifiedProps,
         serialNumber: serial ? serial : "Not Added", // Add the serialNumber property // must remove after test important!!!!
       };
-  
+
       // If updatedData is provided, update the tests property in updatedGlobalData
       if (updatedData !== null) {
         updatedGlobalData.tests = updatedData;
       }
-  
+
       console.log("updatedGlobalDataFinal:", updatedGlobalData);
-  
+
       // Send the updated globalData to the backend
-      const res = await publicRequest.post("/add-test-result", updatedGlobalData);
-  
+      const res = await publicRequest.post(
+        "/add-test-result",
+        updatedGlobalData
+      );
+
       toast.success("data sent successfully");
       setShowVolts(true);
     } catch (error) {
       console.error("Error sending global data to backend:", error);
     }
   };
-  
-  
 
   useEffect(() => {
     const getData = async () => {
@@ -197,6 +204,7 @@ function Runtest() {
         const res = await publicRequest.get(
           `/get-test-by-name${type ? "?nameQuery=" + type : ""}`
         );
+        console.log(res);
         if (res.data && res.data.length > 0 && res.data[0].tests) {
           const testsWithResult = res.data[0].tests.map((test) => ({
             ...test,
@@ -207,22 +215,30 @@ function Runtest() {
             ...res.data[0],
             tests: testsWithResult, // Update the tests property with the new data
           });
-          setSysData(res.data[0])
-          
+          setSysData(res.data[0]);
+
           setData(testsWithResult);
           setActiveTestIndex(0);
+          setActiveSousIndex(0);
           setSucces("");
           setFaild("");
           setAllValue("");
           setShowLabel("");
+          setTestFailed(false)
+          setShowPopup(false)
+          setShowVolts(false)
         } else {
           // Handle the case where the data structure is not as expected
           setData([]);
           setActiveTestIndex(0);
+          setActiveSousIndex(0);
           setSucces("");
           setFaild("");
           setAllValue("");
           setShowLabel("");
+          setTestFailed(false)
+          setShowPopup(false)
+          setShowVolts(false)
         }
       } catch (err) {
         console.log(err);
@@ -230,29 +246,28 @@ function Runtest() {
     };
     getData();
   }, [type]);
-  console.log(sysData)
+
+  // Update the useEffect to set the initial verification text for sub-tests
+useEffect(() => {
+  if (data.length > 0 && data[0].souTests.length > 0) {
+    setSubTestVerificationText(data[0].souTests[0].description);
+  }
+}, [data]);
+
+
   // Modify handleConnect
  
-  const [verificationText, setVerificationText] = useState(
-    data.length > 0 ? data[0].description : ""
-  );
-
-   // Modify handleConnect
- // Modify handleConnect
- const handleConnect = async () => {
-  try {
-    const res = await publicRequest.post("/connect");
-    console.log(res);
-    toast.success("Connection Success")
-    setMac(res.data.address)
-    
-
-  } catch (error) {
-    console.log(error);
-    toast.error("Connection Failed");
-  }
-};
-
+  const handleConnect = async () => {
+    try {
+      const res = await publicRequest.post("/connect");
+      console.log(res);
+      toast.success("Connection Success");
+      setMac(res.data.address);
+    } catch (error) {
+      console.log(error);
+      toast.error("Connection Failed");
+    }
+  };
 
   // Modify handleFetch
   const handleFetch = async () => {
@@ -260,11 +275,10 @@ function Runtest() {
       const data = await publicRequest.get("/tram/COM9");
       console.log(data);
       setTram(data.data);
-      toast.success("Tram Success")
+      toast.success("Tram Success");
     } catch (error) {
       console.log(error);
       toast.error("Fetched Failed");
-
     }
   };
 
@@ -276,26 +290,25 @@ function Runtest() {
       setVerificationText(test.description);
 
       if (data.length > 0) {
-        if (activeTestIndex === 10) {
+        if (activeTestIndex === 1 && activeSousIndex === 0) {
           // Trigger handleConnect when activeTestIndex is 3
 
           setHideButtons(true);
           setVerificationText("Connexion en cours...");
           handleConnect();
-          
+
           // You may want to add a delay for handleConnect actions
           setTimeout(() => {
             setHideButtons(false);
             setVerificationText(test.description);
           }, 6000);
-
-        } else if (activeTestIndex === 11) {
+        } else if  (activeTestIndex === 1 && activeSousIndex === 1) {
           // Trigger handleFetch when activeTestIndex is 4
 
           setHideButtons(true);
           setVerificationText("Fetching data...");
           handleFetch();
-          
+
           // You may want to add a delay for handleFetch actions
           setTimeout(() => {
             setHideButtons(false);
@@ -308,8 +321,7 @@ function Runtest() {
         }
       }
     }
-  }, [activeTestIndex, data]); // Include handleFetch in the dependency array
- 
+  }, [activeTestIndex,activeSousIndex, data]); // Include handleFetch in the dependency array
 
   const handleChange = (e) => {
     setInputValue(e.target.value);
@@ -322,9 +334,9 @@ function Runtest() {
     if (
       selectedValue === "GO" ||
       selectedValue === "Preste" ||
-      selectedValue === "Rival" || 
-      selectedValue === "" 
-    ) { 
+      selectedValue === "Rival" ||
+      selectedValue === ""
+    ) {
       setShowPopup(false); // Set showPopup to false for other options
     }
 
@@ -332,123 +344,249 @@ function Runtest() {
     setType(selectedValue);
   };
 
-  
+  // In your advanceToNextItem function, modify the code to consider sub-test results
   const advanceToNextItem = () => {
     if (!progressActive && !iconCheckDisabled) {
       setProgressActive(true);
       setIconCheckDisabled(true);
       setSucces("");
-      setFaild(""); // Clear the faild text
+      setFaild("");
 
-      // Simulate a 10-second progress
-      setTimeout(() => {
-        setSucces("Step Resultat Pass");
-        setShowLabel("succes"); // Show the success label
-        setProgressActive(false);
-        setIconCheckDisabled(false);
+      const currentTest = data[activeTestIndex];
 
-        if (activeTestIndex < data.length) {
-          // Update the result property to "Pass" for the current test
-          const updatedData = [...data];
-          updatedData[activeTestIndex].result = "pass";
-          setData(updatedData);
+      if (currentTest) {
+        if (
+          currentTest.souTests &&
+          activeSousIndex < currentTest.souTests.length
+        ) {
+          const subTest = currentTest.souTests[activeSousIndex];
 
-          setActiveTestIndex(activeTestIndex + 1);
+          setTimeout(async () => {
+            subTest.etat = "pass";
+            setActiveSousIndex(activeSousIndex + 1);
 
-          // Check if any test result is "fail"
-          const anyTestFailed = updatedData.some(
-            (test) => test.result === "fail"
-          );
+            // Check if any sub-test is 'fail'
+            
+            if (activeSousIndex === currentTest.souTests.length) {
+              // All sub-tests are complete for the current main test
+               // Check if any test result is 'fail'
+               const anyTestFailed = updatedData.some(
+                (test) => test.result === "fail"
+              );
 
-          if (anyTestFailed) {
-            setAllValue("Overall Failed");
-          } else {
-            setAllValue("Overall Pass");
-          }
+              if (anyTestFailed) {
+                setFaild("Step Resultat Failed");
+                setShowLabel("Failed");
+                setSousFailed(true); // You can set a flag to indicate overall test failure
+              } else {
+                setFaild("Step Resultat Failed");
+                setShowLabel("Failed");
+                setSousFailed(false); // Clear the flag for overall test failure
+              }
+  
+              // Update the result property for the current test
+              const updatedData = [...data];
+              updatedData[activeTestIndex] = currentTest;
+              setData(updatedData);
+
+              advanceToNextMainTest();
+
+             
+
+              if (activeTestIndex === data.length - 1) {
+                const updatedGlobalData = { ...globalData, tests: [...data] };
+                setGlobalData(updatedGlobalData);
+                console.log("updatedGlobalData:", updatedGlobalData);
+                // Send globalData to the backend after all updates
+                sendGlobalDataToBackend();
+              }
+            }
+         
+            setProgressActive(false);
+            setIconCheckDisabled(false);
+          }, sysData.timeTest * 1000); // Duration of sub-test
+        } else {
+          // No sub-tests, advance to the next main test
+          advanceToNextMainTest();
+        
         }
-
-        if (activeTestIndex === data.length - 1) {
-          const updatedGlobalData = { ...globalData, tests: [...data] };
-          setGlobalData(updatedGlobalData);
-          console.log("updatedGlobalData :", updatedGlobalData);
-          // Send globalData to the backend after all updates
-          sendGlobalDataToBackend();
-        }
-      }, sysData.timeTest * 1000); // 10 seconds in milliseconds
+      }
     }
   };
 
-  
+  const advanceToNextMainTest = () => {
+    if (!progressActive && !iconCheckDisabled) {
+      setProgressActive(true);
+      setIconCheckDisabled(true);
+    setTimeout(() => {
+      setSucces("Step Resultat Pass");
+      setShowLabel("succes"); // Show the success label
+      setProgressActive(false);
+        setIconCheckDisabled(false);
+    if (activeTestIndex < data.length) {
+      const updatedData = [...data];
+      updatedData[activeTestIndex].result = "pass";
+      setData(updatedData);
+
+      setActiveTestIndex(activeTestIndex + 1);
+
+      const anyTestFailed = updatedData.some((test) => test.result === "fail");
+
+      if (anyTestFailed) {
+        setAllValue("Overall Failed");
+      } else {
+        setAllValue("Overall Pass");
+      }
+      setActiveSousIndex(0);
+      if (activeTestIndex === data.length - 1) {
+        const updatedGlobalData = { ...globalData, tests: [...data] };
+        setGlobalData(updatedGlobalData);
+        console.log("updatedGlobalData:", updatedGlobalData);
+        sendGlobalDataToBackend();
+      }
+      
+    }}, sysData.timeTest * 1000); // 10 seconds in milliseconds
+    }
+    
+  };
+
   const advanceToNextItemX = () => {
+    if (!progressActiveX && !iconXDisabled) {
+      setProgressActiveX(true);
+      setIconXDisabled(true);
+      setSucces("");
+      setFaild("");
+
+      const currentTest = data[activeTestIndex];
+
+      if (
+        currentTest &&
+        currentTest.souTests &&
+        activeSousIndex < currentTest.souTests.length
+      ) {
+        const subTest = currentTest.souTests[activeSousIndex];
+
+        setTimeout(async () => {
+          subTest.etat = "fail";
+          setActiveSousIndex(activeSousIndex + 1);
+
+          // Check if any sub-test is 'fail'
+          const anySubTestFailed = currentTest.souTests.some(
+            (test) => test.etat === "fail"
+          );
+
+          // Update the main test result based on sub-test results
+          if (anySubTestFailed) {
+            currentTest.result = "fail"; // Mark the main test as 'fail'
+          } else {
+            currentTest.result = "pass"; // Mark the main test as 'pass'
+          }
+
+          if (activeSousIndex === currentTest.souTests.length) {
+            // All sub-tests are complete for the current main test
+
+            // Update the result property for the current test
+            const updatedData = [...data];
+            updatedData[activeTestIndex] = currentTest;
+            setData(updatedData);
+
+            setActiveTestIndex(activeTestIndex + 1);
+
+            // Check if any test result is 'fail'
+            const anyTestFailed = updatedData.some(
+              (test) => test.result === "fail"
+            );
+
+            if (anyTestFailed) {
+              setAllValue("Overall Failed");
+              setSousFailed(true); // You can set a flag to indicate overall test failure
+            } else {
+              setAllValue("Overall Pass");
+              setSousFailed(false); // Clear the flag for overall test failure
+            }
+
+            if (activeTestIndex === data.length - 1) {
+              const updatedGlobalData = { ...globalData, tests: [...data] };
+              setGlobalData(updatedGlobalData);
+              console.log("updatedGlobalData:", updatedGlobalData);
+              // Send globalData to the backend after all updates
+              sendGlobalDataToBackend();
+            }
+          }
+          setProgressActiveX(false);
+          setIconXDisabled(false);
+        }, sysData.timeTest * 1000); // Duration of sub-test
+      } else {
+        // No sub-tests, advance to the next main test
+        setProgressActiveX(false);
+        setIconXDisabled(false);
+        advanceToNextMainTestX();
+      }
+    }
+  };
+
+  const advanceToNextMainTestX = () => {
     if (!progressActiveX && !iconXDisabled) {
       setProgressActiveX(true);
       setIconXDisabled(true);
       setFaild("");
       setSucces("");
-  
-      if (activeTestIndex >= 0 && activeTestIndex <= 4) {
-        setTimeout(() => {
-          setFaild("Step Resultat Failed");
-          setShowLabel("Failed");
-          setAllValue("Overall Failed");
-          setProgressActiveX(false);
-          setIconXDisabled(false);
-  
-          const updatedData = data.map((test) => ({
-          ...test,
-          result: "fail",
-          testId: test._id, // Add the testId property
-        }));
-      
-        // Update the data state with the updatedData array
-        setTestFailed(true)
-        setData(updatedData);
-        
-      
-        // Send updatedData to the backend
-        sendGlobalDataToBackendFaild(updatedData);
-  
-        }, 10000);
+    if (activeTestIndex >= 0 && activeTestIndex <= 1) {
+      setFaild("Step Resultat Failed");
+      setShowLabel("Failed");
+      setAllValue("Overall Failed");
+      setProgressActiveX(false);
+      setIconXDisabled(false);
+
+      const updatedData = data.map((test) => ({
+        ...test,
+        result: "fail",
+        testId: test._id, // Add the testId property
+      }));
+
+      // Update the data state with the updatedData array
+      setTestFailed(true);
+      setData(updatedData);
+
+      // Send updatedData to the backend
+      sendGlobalDataToBackendFaild(updatedData);
+    } else {
+      setTimeout(() => {
+        setFaild("Step Resultat Failed");
+        setShowLabel("Failed");
+        setProgressActiveX(false);
+        setIconXDisabled(false);
+      if (activeTestIndex < data.length) {
        
-        
-      } else {
-        // Continue with your existing logic for other test steps
-        setTimeout(() => {
-          setFaild("Step Resultat Failed");
-          setShowLabel("Failed");
-          setProgressActiveX(false);
-          setIconXDisabled(false);
+        const updatedData = [...data];
+        updatedData[activeTestIndex].result = "fail";
+        setData(updatedData);
+
+        setActiveTestIndex(activeTestIndex + 1);
+
+        const anyTestFailed = updatedData.some(
+          (test) => test.result === "fail"
+        );
+
+        if (anyTestFailed) {
+          setAllValue("Overall Failed");
+        } else {
+          setAllValue("Overall Pass");
+        }
+        setActiveSousIndex(0);
+        if (activeTestIndex === data.length - 1) {
+          const updatedGlobalData = { ...globalData, tests: [...data] };
+          setGlobalData(updatedGlobalData);
+          console.log("updatedGlobalData:", updatedGlobalData);
+          sendGlobalDataToBackend();
+        }
+      }}, sysData.timeTest * 1000);
+
   
-          if (activeTestIndex < data.length) {
-            // Update the result property to "Fail" for the current test
-            const updatedData = [...data];
-            updatedData[activeTestIndex].result = "fail";
-            setData(updatedData);
-  
-            setActiveTestIndex(activeTestIndex + 1);
-  
-            const anyTestFailed = updatedData.some((test) => test.result === "fail");
-  
-            if (anyTestFailed) {
-              setAllValue("Overall Failed");
-            } else {
-              setAllValue("Overall Pass");
-            }
-          }
-  
-          if (activeTestIndex === data.length - 1) {
-            setAllValue("Overall Failed");
-            const updatedGlobalData = { ...globalData, tests: [...data] };
-            setGlobalData(updatedGlobalData);
-            sendGlobalDataToBackend(updatedGlobalData);
-          }
-        }, sysData.timeTest * 1000);
-      }
     }
+  }
   };
-  
-  
-  
+
   return (
     <>
       <NavRigas />
@@ -549,33 +687,45 @@ function Runtest() {
               </Card1>
             </Card1Container1>
             <Step>
-  <Table>
-    {data.map((test, index) => (
-      <Tr key={test._id} active={index === activeTestIndex}>
-        <TextField
-          style={{
-            color:
-              test.result === "fail"
-                ? "#FF0000"
-                : test.result === "pass"
-                ? "#32CD32"
-                : "inherit",
-          }}
-        >
-          Étape {index + 1}: {test.description}
-          <ul>
-            {test.souTests.map((souTest, souTestIndex) => (
-              <li key={`${souTest._id}_${souTestIndex}`}> {/* Provide a unique key */}
-                {souTest.description}
-              </li>
-            ))}
-          </ul>
-        </TextField>
-      </Tr>
-    ))}
-  </Table>
-</Step>
-
+              <Table>
+                {data.map((test, index) => (
+                  <Tr key={test._id} active={index === activeTestIndex}>
+                    <TextField
+                      style={{
+                        color:
+                          test.result === "fail"
+                            ? "#FF0000"
+                            : test.result === "pass"
+                            ? "#32CD32"
+                            : "inherit",
+                      }}
+                    >
+                      Étape {index + 1}: {test.description}
+                      <ul>
+                        {test.souTests.map((souTest, souTestIndex) => (
+                          <li
+                            key={`${souTest._id}_${souTestIndex}`}
+                            active={index === activeSousIndex}
+                            style={{
+                              color:
+                                souTest.etat === "fail"
+                                  ? "#FF0000"
+                                  : souTest.etat === "pass"
+                                  ? "#32CD32"
+                                  : "inherit",
+                            }}
+                          >
+                            {" "}
+                            {/* Provide a unique key */}
+                            {souTest.description}
+                          </li>
+                        ))}
+                      </ul>
+                    </TextField>
+                  </Tr>
+                ))}
+              </Table>
+            </Step>
           </InnerContainer1>
           <InnerContainer2>
             <Card1Container2>
@@ -602,11 +752,13 @@ function Runtest() {
                 <CardItem3>
                   <TextScrole1>Step Progress</TextScrole1>
                   <ProgressBarContainer1>
-                    {progressActive ? (
-                      <ProgressBarLine />
-                    ) : progressActiveX ? (
-                      <ProgressBarLineFaild />
-                    ) : null}
+                    {data[activeTestIndex] && (
+                      <ProgressBarLine
+                        souTests={data[activeTestIndex].souTests}
+                        activeSousIndex={activeSousIndex}
+                        sousFailed={sousFailed}
+                      />
+                    )}
                   </ProgressBarContainer1>
                 </CardItem3>
 
@@ -653,7 +805,18 @@ function Runtest() {
         {showPopup && (
           <DivVerifier>
             <TextInsideBorder>Operator Instructions</TextInsideBorder>
-            <TextVerif>{verificationText}</TextVerif>
+            <TextVerif>
+              {!hideButtons
+                ? data[activeTestIndex] &&
+                  (data[activeTestIndex].souTests &&
+                  data[activeTestIndex].souTests[activeSousIndex]
+                    ? data[activeTestIndex].souTests[activeSousIndex]
+                        .description
+                    : data[activeTestIndex]
+                    ? data[activeTestIndex].description
+                    : "")
+                : verificationText}
+            </TextVerif>
             {!hideButtons && (
               <CardButton>
                 <CardProgress>
@@ -668,7 +831,9 @@ function Runtest() {
                       disabled={iconXDisabled}
                     />
                   )}
-                  {progressActiveX && <CircularProgressBarFaild />}
+                  {progressActiveX && (
+                    <CircularProgressBarFaild time={sysData.timeTest} />
+                  )}
                 </CardProgress>
 
                 <CardProgress>
@@ -683,7 +848,9 @@ function Runtest() {
                       disabled={iconCheckDisabled}
                     />
                   )}
-                  {progressActive && <CircularProgressBar time={sysData.timeTest} />}
+                  {progressActive && (
+                    <CircularProgressBar time={sysData.timeTest} />
+                  )}
                 </CardProgress>
               </CardButton>
             )}

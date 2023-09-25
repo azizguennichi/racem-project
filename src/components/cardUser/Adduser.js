@@ -72,7 +72,7 @@ function Adduser() {
           <Label>Role</Label>
           <Role onChange={(e) => setRole(e.target.value)} value={role}>
             <option value="super-admin">super-admin</option>
-            <option value="admin"> admin</option>
+           {/*  <option value="admin"> admin</option> */}
             <option value="expert"> expert</option>
             <option value="operator">operator </option>
           </Role>

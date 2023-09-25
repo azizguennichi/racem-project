@@ -83,6 +83,8 @@ function Menu() {
                 handleMenuItemClick(index);
               }
             }}
+            // Apply the disabledStyles if the item is disabled
+            disabled={item.role.includes(userRole) ? false : true}
           >
             <Container>
               {item.icon}

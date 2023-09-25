@@ -26,7 +26,7 @@ const duration_bar = time; // Set the constant duration in seconds
     };
   }, []); // The empty dependency array ensures this effect runs once on component mount
   return (
-    <div style={{ width: 75, height: 75,position: 'absolute', left: '300px'  }}>
+    <div style={{ width: 73, height: 73,position: 'absolute', left: '300px'  }}>
       <CircularProgressbar
         value={progress}
         text={`${Math.round(progress)}%`}

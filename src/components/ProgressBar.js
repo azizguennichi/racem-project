@@ -1,44 +1,76 @@
 import React, { useState, useEffect } from "react";
-import ProgressBar from "@ramonak/react-progress-bar";
 
-function ProgressBarLine() {
-  const duration_bar = 10; // Set the constant duration in seconds
-  const intervalDuration = 1000; // Set the interval to 1000ms (1 second)
-  const [progress, setProgress] = useState(0);
+function ProgressBarLine({ souTests, activeSousIndex, sousFailed }) {
+  const [segments, setSegments] = useState([]);
+  const [progressLabel, setProgressLabel] = useState("0%");
+  const [labelPosition, setLabelPosition] = useState(0);
 
   useEffect(() => {
-    const increment = (1 / duration_bar) * 100;
-    const totalIntervals = duration_bar * 1000 / intervalDuration;
-    let currentProgress = 0;
+    const totalTests = souTests.length ;
+    const progressSegments = souTests.map((test, index) => {
+      const color = test.etat === "pass" ? "#00D328" : "#FF0000";
+      const bgColor = test.etat === "pass" || test.etat === "fail" ? color : "inherit";
 
-    const intervalId = setInterval(() => {
-      if (currentProgress < 100) {
-        currentProgress += increment;
-        setProgress(currentProgress);
-      } else {
-        clearInterval(intervalId); // Stop the timer when progress reaches 100%
+      if (sousFailed && test.etat !== "pass") {
+        return {
+          completed: 100 / totalTests,
+          bgColor: "#FF0000",
+          color: "#FF0000",
+        };
       }
-    }, intervalDuration);
 
-    return () => {
-      clearInterval(intervalId); // Clean up the interval on unmount
-    };
-  }, []); // The empty dependency array ensures this effect runs once on component mount
+      // Calculate the progress based on activeSousIndex
+      const completed = (index < activeSousIndex ? 100 : 0) / totalTests;
+
+      return {
+        completed,
+        bgColor,
+        color,
+      };
+    });
+
+    setSegments(progressSegments);
+
+    const overallProgress = (activeSousIndex / totalTests) * 100;
+
+    setProgressLabel(sousFailed ? "100%" : `${Math.round(overallProgress)}%`);
+
+    // Set labelPosition based on activeSousIndex
+    setLabelPosition((activeSousIndex / totalTests) * 100);
+  }, [souTests, activeSousIndex, sousFailed]);
 
   return (
-    <>
-      <ProgressBar
-        completed={progress}
-        bgColor="#00D328"
-        height="30px"
-        borderRadius="4px"
-        labelColor="#ffffff"
-        labelSize="18px"
-      />
-
-    </>
+    <div style={{ position: "relative", overflow: "hidden" }}>
+      {segments.map((segment, index) => (
+        <div
+          key={index}
+          style={{
+            width: `${segment.completed}%`,
+            height: "30px",
+            backgroundColor: segment.bgColor,
+            color: segment.color,
+            display: "inline-block",
+            position: "relative",
+            transition: "width 3s",
+          }}
+        ></div>
+      ))}
+      <div
+        style={{
+          position: "absolute",
+          top: "40%",
+          left: `${labelPosition}%`,
+          transform: "translate(-110%, -50%)",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "18px",
+          transition: "left 3s",
+        }}
+      >
+        {progressLabel}
+      </div>
+    </div>
   );
 }
 
 export default ProgressBarLine;
-

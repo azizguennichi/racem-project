@@ -191,7 +191,7 @@ const getCommonEditTextFieldProps = useCallback(
             // Map the select options to an array of MenuItem components
             ...[
               'super-admin',
-              'admin',
+              /* 'admin', */
               'expert',
               'operator',
             ].map((option) => (
